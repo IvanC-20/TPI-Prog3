@@ -84,17 +84,168 @@ app.post('/notificacion', async (req, res) => {
 app.get('/salones/:salon_id', async (req, res) => {
     try {
         const salon_id = req.params.salon_id;
-        const sql = `SELECT * FROM salones WHERE salon_id = ? and activo = ?`;
+        const sql = `SELECT * FROM salones WHERE activo = 1 and salon_id = ?`;
+        const valores = [salon_id];
         //usando sentencias preparadas evitamos la injección sql,
         //los datos del array se vinculan de forma segura a la consulta
-        const [results, fields] = await conexion.query(sql, [salon_id, 1]);
+        const [results, fields] = await conexion.execute(sql, valores);
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                estado: false,
+                mensaje: "Salón no encontrado."
+            })
+        }
 
         //console.log(results); // results contains rows returned by server
         //console.log(fields); // fields contains extra meta data about results, if available
-        res.json({ 'ok': true, 'salon': results });
+        res.json({
+            estado: true,
+            salon: results[0]
+        });
 
     } catch (err) {
-        console.log(err);
+        console.log("Error en GET/salones/:salon_id", err);
+        res.status(500).json({
+            estado: false,
+            mensaje: "Error interno del servidor."
+        })
+    }
+
+})
+
+app.post('/salones', async (req, res) => {
+
+    try {
+
+        //falta validar con express validator, queda para mas adelante con un middleware
+        //control datos requeridos
+        if (!req.body.titulo || !req.body.direccion || !req.body.capacidad || !req.body.importe) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: "Faltan campos requeridos."
+            })
+        }
+
+        const { titulo, direccion, capacidad, importe } = req.body;
+        const valores = [titulo, direccion, capacidad, importe];
+        const sql = `INSERT INTO salones (titulo, direccion, capacidad, importe) 
+                    VALUES (?,?,?,?)`;
+
+
+        const result = await conexion.execute(sql, valores);
+        console.log(result);
+        res.status(201).json({
+            estado: true,
+            mensaje: `Salón creado con id: ${result[0].insertId}`,
+            Salon: {
+                titulo: valores[0],
+                direccion: valores[1],
+                capacidad: valores[2],
+                importe: valores[3]
+
+            }
+        });
+
+    } catch (err) {
+        console.log("Error en POST/salones", err);
+        res.status(500).json({
+            estado: false,
+            mensaje: "Error interno del servidor."
+        })
+    }
+})
+
+app.put("/salones/:salon_id", async (req, res) => {
+    try {
+        const salon_id = req.params.salon_id;
+
+        const sql = `SELECT * FROM salones WHERE activo = 1 and salon_id = ?`;
+
+        //usando sentencias preparadas evitamos la injección sql,
+        //los datos del array se vinculan de forma segura a la consulta
+        const [results] = await conexion.execute(sql, [salon_id]);
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                estado: false,
+                mensaje: "Salón no existe."
+            })
+        }
+
+        if (!req.body.titulo || !req.body.direccion || !req.body.capacidad || !req.body.importe) {
+            return res.status(400).json({
+                estado: false,
+                mensaje: "Faltan campos requeridos."
+            })
+        }
+
+        const { titulo, direccion, capacidad, importe } = req.body;
+        const valores = [titulo, direccion, capacidad, importe, salon_id];
+        const sql1 = `UPDATE salones SET titulo=?, direccion=?, capacidad=?, importe=? 
+                    WHERE salon_id = ?`;
+
+
+        const result = await conexion.execute(sql1, valores);
+        console.log(result);
+        res.status(200).json({
+            estado: true,
+            mensaje: `Salón modificado.`,
+            Salon: {
+                titulo: valores[0],
+                direccion: valores[1],
+                capacidad: valores[2],
+                importe: valores[3]
+            }
+        })
+    } catch (error) {
+        console.log("Error en PUT/salones/:salon_id", error);
+        res.status(500).json({
+            estado: false,
+            mensaje: "Error interno del servidor."
+        })
+
+    }
+})
+
+app.delete("/salones/:salon_id", async (req, res) => {
+
+    try {
+        const salon_id = req.params.salon_id;
+
+        const sql = `SELECT * FROM salones WHERE activo = 1 and salon_id = ?`;
+
+        //usando sentencias preparadas evitamos la injección sql,
+        //los datos del array se vinculan de forma segura a la consulta
+        const [results] = await conexion.execute(sql, [salon_id]);
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                estado: false,
+                mensaje: "Salón no existe."
+            })
+        }
+
+        const valores = [0, salon_id];
+        const sql1 = `UPDATE salones SET activo=? 
+                    WHERE salon_id = ?`;
+
+
+        const [result] = await conexion.execute(sql1, valores);
+        console.log(result);
+        if (result.affectedRows == 1) {
+            res.status(200).json({
+                estado: true,
+                mensaje: `Salón ${salon_id} eliminado. (Estado activo = 0)`,
+
+            })
+        }
+    } catch (error) {
+        console.log("Error en PATCH/salones/:salon_id", error);
+        res.status(500).json({
+            estado: false,
+            mensaje: "Error interno del servidor."
+        })
     }
 
 })
