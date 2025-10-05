@@ -1,4 +1,15 @@
-import express from "express";
+import express from 'express';
+import { router as v1SalonesRutas } from './v1/rutas/salonesRutas.js';
+const app = express();
+
+app.use(express.json());
+app.use('/api/v1/salones', v1SalonesRutas);
+// hacer esto para cada entidad
+
+// ESTO DEJAMOS COMENTADO PERO CUANDO SABEMOS QUE FUNCIONA EL CRUD DE SALONES, VUELAA
+// DONDE DEJAMOS NOTIFICACION??? TMB ESTA AQUI COMENTADO
+
+/*import express from "express";
 import handlebars from "handlebars";
 import nodemailer from "nodemailer";
 import { fileURLToPath } from "url";
@@ -249,6 +260,7 @@ app.delete("/salones/:salon_id", async (req, res) => {
     }
 
 })
+*/
 
 //cargamos las variables de entorno que estan definidas en el archivo .env (en el objeto process.env)
 process.loadEnvFile();
@@ -256,3 +268,5 @@ process.loadEnvFile();
 app.listen(process.env.PUERTO, () => {
     console.log(`Servidor arriba en Puerto:  ${process.env.PUERTO}`)
 })
+
+

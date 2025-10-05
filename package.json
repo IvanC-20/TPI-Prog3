@@ -2,11 +2,11 @@
   "name": "app-reservas",
   "version": "1.0.0",
   "description": "aplicación de reservas casa de cumpleaños",
-  "main": "index.js",
+  "main": "src/reservas.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "des": "node --watch index.js"
+    "des": "node --watch src/reservas.js"
   },
   "author": "Grupo AP",
   "license": "ISC",
