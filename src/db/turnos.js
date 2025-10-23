@@ -29,13 +29,13 @@ export default class Turnos {
                  WHERE turno_id = ? AND activo = 1`;
     const valores = [orden ?? null, hora_desde ?? null, hora_hasta ?? null, ahora, turno_id];
     const [result] = await conexion.execute(sql, valores);
-    return result; // result.affectedRows
+    return result; 
   }
 
   async eliminarTurno(turno_id) {
     const ahora = new Date();
     const sql = `UPDATE turnos SET activo = 0, modificado = ? WHERE turno_id = ? AND activo = 1`;
     const [result] = await conexion.execute(sql, [ahora, turno_id]);
-    return result; // result.affectedRows
+    return result;
   }
 }
