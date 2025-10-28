@@ -12,6 +12,17 @@ export default class Usuarios {
     return rows;
   }
 
+  // lo usamos para auth
+  buscar = async (nombre_usuario, contrasenia) => {
+    const sql = `SELECT u.usuario_id, CONCAT(u.nombre, ' ', u.apellido) as usuario, u.tipo_usuario
+                    FROM usuarios  AS u
+                    WHERE u.nombre_usuario = ? 
+                        AND u.contrasenia = SHA2(?, 256) 
+                        AND u.activo = 1;`
+    const [result] = await conexion.query(sql, [nombre_usuario, contrasenia]);
+    return result[0];
+  }
+  
   async obtenerUsuarioPorId(usuario_id) {
     const sql = `
       SELECT usuario_id, nombre, apellido, nombre_usuario, tipo_usuario, celular, foto, creado, modificado

@@ -22,6 +22,11 @@ export default class UsuariosServicio {
     return this.model.buscarTodos();
   }
 
+  // lo usamos para auth
+  buscar = (nombre_usuario, contrasenia) => {
+    return this.model.buscar(nombre_usuario, contrasenia);
+  }
+
   async obtenerPorId(usuario_id) {
     const datos = await this.model.obtenerUsuarioPorId(usuario_id);
     if (!datos || datos.length === 0) {
