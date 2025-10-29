@@ -5,66 +5,86 @@ export default class ServiciosServicio {
     this.model = new Servicios();
   }
 
-  async listar() {
-    return this.model.buscarTodos();
+  async buscarTodos() {
+    return await this.model.buscarTodos();
   }
 
-  async obtenerPorId(servicio_id) {
+  async obtenerServicioPorId(servicio_id) {
     const datos = await this.model.obtenerServicioPorId(servicio_id);
     if (!datos || datos.length === 0) {
-      const err = new Error("Servicio no encontrado");
+      const err = new Error("Servicio no encontrado.");
       err.status = 404;
       throw err;
     }
     return datos[0];
   }
 
-  async crear(payload) {
-    if (!payload?.descripcion || String(payload.descripcion).trim().length < 3) {
-      const err = new Error("La descripción es obligatoria (mín. 3 caracteres)");
+  async crearServicio(payload) {
+    const { descripcion, importe } = payload;
+
+    if (!descripcion || String(descripcion).trim().length < 3) {
+      const err = new Error("Faltan campos requeridos.");
       err.status = 400;
       throw err;
     }
-    if (payload.importe != null && Number(payload.importe) < 0) {
-      const err = new Error("El importe debe ser mayor o igual a 0");
+
+    if (importe == null || Number(importe) < 0) {
+      const err = new Error("Faltan campos requeridos.");
       err.status = 400;
       throw err;
     }
+
     const result = await this.model.crearServicio({
-      descripcion: String(payload.descripcion).trim(),
-      importe: payload.importe != null ? Number(payload.importe) : null
+      descripcion: String(descripcion).trim(),
+      importe: Number(importe)
     });
+
     return result.insertId;
   }
 
-  async actualizar(servicio_id, payload) {
-    if (!payload?.descripcion || String(payload.descripcion).trim().length < 3) {
-      const err = new Error("La descripción es obligatoria (mín. 3 caracteres)");
+  async actualizarServicio(servicio_id, payload) {
+    const existente = await this.model.obtenerServicioPorId(servicio_id);
+    if (!existente || existente.length === 0) {
+      const err = new Error("Servicio no encontrado.");
+      err.status = 404;
+      throw err;
+    }
+
+    const { descripcion, importe } = payload;
+
+    if (!descripcion || String(descripcion).trim().length < 3) {
+      const err = new Error("Faltan campos requeridos.");
       err.status = 400;
       throw err;
     }
-    if (payload.importe != null && Number(payload.importe) < 0) {
-      const err = new Error("El importe debe ser mayor o igual a 0");
+
+    if (importe == null || Number(importe) < 0) {
+      const err = new Error("Faltan campos requeridos.");
       err.status = 400;
       throw err;
     }
+
     const result = await this.model.actualizarServicio(servicio_id, {
-      descripcion: String(payload.descripcion).trim(),
-      importe: payload.importe != null ? Number(payload.importe) : null
+      descripcion: String(descripcion).trim(),
+      importe: Number(importe)
     });
+
     if (result.affectedRows === 0) {
-      const err = new Error("Servicio no encontrado o inactivo");
+      const err = new Error("Servicio no encontrado.");
       err.status = 404;
       throw err;
     }
   }
 
-  async eliminar(servicio_id) {
-    const result = await this.model.eliminarServicio(servicio_id);
-    if (result.affectedRows === 0) {
-      const err = new Error("Servicio no encontrado");
+  async eliminarServicio(servicio_id) {
+    const existente = await this.model.obtenerServicioPorId(servicio_id);
+    if (!existente || existente.length === 0) {
+      const err = new Error("Servicio no encontrado.");
       err.status = 404;
       throw err;
     }
+
+    const result = await this.model.eliminarServicio(servicio_id);
+    return result.affectedRows === 1;
   }
 }

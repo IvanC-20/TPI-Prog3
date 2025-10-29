@@ -26,10 +26,10 @@ app.use(morgan('combined', { stream: log })); // logs en el archivo access.log
 app.use(express.json());
 
 app.use('/api/v1/auth', v1AuthRouter); // auth
-app.use('/api/v1/servicios', v1ServiciosRutas);
 app.use('/api/v1/turnos', v1TurnosRutas);
 app.use('/api/v1/usuarios', v1UsuariosRutas);
 
+app.use('/api/v1/servicios', passport.authenticate('jwt', { session:false }), v1ServiciosRutas);
 app.use('/api/v1/salones', passport.authenticate( 'jwt', { session:false }), v1SalonesRutas);
 app.use('/api/v1/reservas', passport.authenticate( 'jwt', { session:false }), v1ReservasRutas);
 
