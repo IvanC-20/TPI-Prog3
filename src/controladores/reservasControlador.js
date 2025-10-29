@@ -7,49 +7,75 @@ export default class ReservasControlador {
 
   buscarTodos = async (_req, res) => {
     try {
-      const reservas = await this.servicio.listar();
+      const reservas = await this.servicio.buscarTodos(_req.user);
       return res.json({ estado: true, reservas });
     } catch (error) {
-      return res.status(error.status || 400).json({ estado: false, mensaje: error.message, errores: error.errores });
+      return res
+        .status(error.status || 400)
+        .json({ estado: false, mensaje: error.message, errores: error.errores });
     }
   };
 
   obtenerReservaPorId = async (req, res) => {
     try {
       const { reserva_id } = req.params;
-      const reserva = await this.servicio.obtenerPorId(Number(reserva_id));
+      const reserva = await this.servicio.buscarPorId(Number(reserva_id));
+      if (!reserva) {
+        return res.status(404).json({ estado: false, mensaje: "Reserva no encontrada." });
+      }
       return res.json({ estado: true, reserva });
     } catch (error) {
-      return res.status(error.status || 400).json({ estado: false, mensaje: error.message, errores: error.errores });
+      return res
+        .status(error.status || 400)
+        .json({ estado: false, mensaje: error.message, errores: error.errores });
     }
   };
 
   crearReserva = async (req, res) => {
     try {
-      const id = await this.servicio.crear(req.body);
-      return res.status(201).json({ estado: true, mensaje: `Reserva creada con id: ${id}`, reserva_id: id });
+      const nuevaReserva = await this.servicio.crear(req.body);
+      if (!nuevaReserva) {
+        return res.status(400).json({ estado: false, mensaje: "No se pudo crear la reserva." });
+      }
+      return res
+        .status(201)
+        .json({ estado: true, mensaje: "Reserva creada correctamente.", reserva: nuevaReserva });
     } catch (error) {
-      return res.status(error.status || 400).json({ estado: false, mensaje: error.message, errores: error.errores });
+      return res
+        .status(error.status || 400)
+        .json({ estado: false, mensaje: error.message, errores: error.errores });
     }
   };
 
   actualizarReserva = async (req, res) => {
     try {
       const { reserva_id } = req.params;
-      await this.servicio.actualizar(Number(reserva_id), req.body);
-      return res.json({ estado: true, mensaje: "Reserva actualizada" });
+      const actualizada = await this.servicio.actualizar(Number(reserva_id), req.body);
+      if (!actualizada) {
+        return res
+          .status(404)
+          .json({ estado: false, mensaje: "Reserva no encontrada o no actualizada." });
+      }
+      return res.json({ estado: true, mensaje: "Reserva actualizada correctamente." });
     } catch (error) {
-      return res.status(error.status || 400).json({ estado: false, mensaje: error.message, errores: error.errores });
+      return res
+        .status(error.status || 400)
+        .json({ estado: false, mensaje: error.message, errores: error.errores });
     }
   };
 
   eliminarReserva = async (req, res) => {
     try {
       const { reserva_id } = req.params;
-      await this.servicio.eliminar(Number(reserva_id));
-      return res.json({ estado: true, mensaje: "Reserva eliminada (soft delete)" });
+      const eliminada = await this.servicio.eliminar(Number(reserva_id));
+      if (!eliminada) {
+        return res.status(404).json({ estado: false, mensaje: "Reserva no encontrada." });
+      }
+      return res.json({ estado: true, mensaje: "Reserva eliminada correctamente." });
     } catch (error) {
-      return res.status(error.status || 400).json({ estado: false, mensaje: error.message, errores: error.errores });
+      return res
+        .status(error.status || 400)
+        .json({ estado: false, mensaje: error.message, errores: error.errores });
     }
   };
 }

@@ -1,6 +1,13 @@
 import { conexion } from "./conexion.js";
 
 export default class Reservas {
+
+  buscarPropias = async(usuario_id) => {
+    const sql = 'SELECT * FROM reservas WHERE activo = 1 AND usuario_id = ?';
+    const [reservas] = await conexion.execute(sql, [usuario_id]);
+    return reservas;
+  }
+  
   async buscarTodos() {
     const sql = `
       SELECT reserva_id, fecha_reserva, salon_id, usuario_id, turno_id,
@@ -51,7 +58,7 @@ export default class Reservas {
       ahora
     ];
     const [result] = await conexion.execute(sql, valores);
-    return { insertId: result.insertId };
+    return { reserva_id: result.insertId };
   }
 
   async actualizarReserva(reserva_id, {
@@ -88,4 +95,16 @@ export default class Reservas {
     const [result] = await conexion.execute(sql, [ahora, reserva_id]);
     return result; 
   }
+
+  datosParaNotificacion = async(reserva_id) => {
+    const sql = `CALL obtenerDatosNotificacion(?)`;
+    
+    const [reserva] = await conexion.execute(sql, [reserva_id]);
+    if(reserva.length === 0){
+        return null;
+    }
+
+    return reserva;
+ }
+
 }

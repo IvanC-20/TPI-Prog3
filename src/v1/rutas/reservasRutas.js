@@ -26,7 +26,7 @@ router.post('/', autorizarUsuarios([1,3]),
     ],
     reservasControlador.crearReserva);
 
-router.put('/', autorizarUsuarios([1,3]),
+router.put('/:reserva_id', autorizarUsuarios([1,3]),
     [
         check('fecha_reserva', 'La fecha es necesaria.').notEmpty(),
         check('salon_id', 'El salón es necesario.').notEmpty(),
