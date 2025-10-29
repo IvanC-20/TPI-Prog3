@@ -27,7 +27,7 @@ const validacion = new JwtStrategy(
   async (jwtPayload, done) => {
     try {
       const usuariosServicio = new UsuariosServicio();
-      const usuario = await usuariosServicio.obtenerPorId(jwtPayload.usuario_id);
+      const usuario = await usuariosServicio.obtenerUsuarioPorId(jwtPayload.usuario_id);
       if (!usuario) return done(null, false, { mensaje: "Token incorrecto!" });
       return done(null, usuario);
     } catch (err) {

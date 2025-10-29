@@ -7,138 +7,137 @@ function hashContrasenia(plain) {
   return `${salt}$${h}`;
 }
 
-function toIntOrNull(v) {
-  if (v === undefined || v === null || v === "") return null;
-  const n = Number(v);
-  return Number.isInteger(n) ? n : null;
-}
-
 export default class UsuariosServicio {
   constructor() {
     this.model = new Usuarios();
   }
 
-  async listar() {
+  // para listar todos los usuarios activos
+  async buscarTodos() {
     return this.model.buscarTodos();
   }
 
-  // lo usamos para auth
+  // se usa con auth
   buscar = (nombre_usuario, contrasenia) => {
     return this.model.buscar(nombre_usuario, contrasenia);
-  }
+  };
 
-  async obtenerPorId(usuario_id) {
+  async obtenerUsuarioPorId(usuario_id) {
     const datos = await this.model.obtenerUsuarioPorId(usuario_id);
     if (!datos || datos.length === 0) {
-      const err = new Error("Usuario no encontrado");
+      const err = new Error("Usuario no encontrado.");
       err.status = 404;
       throw err;
     }
     return datos[0];
   }
 
-  // -------- Validaciones --------
-  validarCrear(payload) {
-    const errores = [];
+  async crearUsuario(payload) {
+    const {
+      nombre,
+      apellido,
+      nombre_usuario,
+      contrasenia,
+      tipo_usuario,
+      celular,
+      foto
+    } = payload;
 
-    const nombre = String(payload?.nombre ?? "").trim();
-    const apellido = String(payload?.apellido ?? "").trim();
-    const nombre_usuario = String(payload?.nombre_usuario ?? "").trim().toLowerCase();
-    const contrasenia = String(payload?.contrasenia ?? "");
-    const tipo_usuario = toIntOrNull(payload?.tipo_usuario);
-    const celular = payload?.celular != null ? String(payload.celular).trim() : null;
-    const foto = payload?.foto != null ? String(payload.foto).trim() : null;
-
-    if (nombre.length < 2) errores.push({ campo: "nombre", mensaje: "Debe tener al menos 2 caracteres" });
-    if (apellido.length < 2) errores.push({ campo: "apellido", mensaje: "Debe tener al menos 2 caracteres" });
-    if (nombre_usuario.length < 3) errores.push({ campo: "nombre_usuario", mensaje: "Debe tener al menos 3 caracteres" });
-    if (contrasenia.length < 6) errores.push({ campo: "contrasenia", mensaje: "Debe tener al menos 6 caracteres" });
-    if (tipo_usuario === null) errores.push({ campo: "tipo_usuario", mensaje: "Debe ser un número entero obligatorio" });
-
-    if (errores.length) {
-      const err = new Error("Validación de usuarios fallida");
-      err.status = 400;
-      err.errores = errores;
-      throw err;
-    }
-
-    return { nombre, apellido, nombre_usuario, contrasenia, tipo_usuario, celular, foto };
-  }
-
-  validarActualizar(payload) {
-    const errores = [];
-
-    const nombre = String(payload?.nombre ?? "").trim();
-    const apellido = String(payload?.apellido ?? "").trim();
-    const nombre_usuario = String(payload?.nombre_usuario ?? "").trim().toLowerCase();
-    const contrasenia = payload?.contrasenia != null ? String(payload.contrasenia) : null;
-    const tipo_usuario = toIntOrNull(payload?.tipo_usuario);
-    const celular = payload?.celular != null ? String(payload.celular).trim() : null;
-    const foto = payload?.foto != null ? String(payload.foto).trim() : null;
-
-    if (nombre.length < 2) errores.push({ campo: "nombre", mensaje: "Debe tener al menos 2 caracteres" });
-    if (apellido.length < 2) errores.push({ campo: "apellido", mensaje: "Debe tener al menos 2 caracteres" });
-    if (nombre_usuario.length < 3) errores.push({ campo: "nombre_usuario", mensaje: "Debe tener al menos 3 caracteres" });
-    if (tipo_usuario === null) errores.push({ campo: "tipo_usuario", mensaje: "Debe ser un número entero obligatorio" });
-    if (contrasenia !== null && contrasenia.length < 6) errores.push({ campo: "contrasenia", mensaje: "Debe tener al menos 6 caracteres" });
-
-    if (errores.length) {
-      const err = new Error("Validación de usuarios fallida");
-      err.status = 400;
-      err.errores = errores;
-      throw err;
-    }
-
-    return { nombre, apellido, nombre_usuario, contrasenia, tipo_usuario, celular, foto };
-  }
-
-  // -------- Casos de uso --------
-  async crear(payload) {
-    const limpio = this.validarCrear(payload);
-
-    const ya = await this.model.obtenerPorNombreUsuario(limpio.nombre_usuario);
-    if (ya && ya.length) {
+    // chequeo de duplicado de nombre_usuario
+    const existente = await this.model.obtenerPorNombreUsuario(
+      String(nombre_usuario).trim().toLowerCase()
+    );
+    if (existente && existente.length) {
       const err = new Error("El nombre de usuario ya existe");
       err.status = 400;
       throw err;
     }
 
     const result = await this.model.crearUsuario({
-      ...limpio,
-      contrasenia: hashContrasenia(limpio.contrasenia)
+      nombre: String(nombre).trim(),
+      apellido: String(apellido).trim(),
+      nombre_usuario: String(nombre_usuario).trim().toLowerCase(),
+      contrasenia: hashContrasenia(String(contrasenia).trim()),
+      tipo_usuario: Number(tipo_usuario),
+      celular: celular != null ? String(celular).trim() : null,
+      foto: foto != null ? String(foto).trim() : null
     });
 
     return result.insertId;
   }
 
-  async actualizar(usuario_id, payload) {
-    const limpio = this.validarActualizar(payload);
+  async actualizarUsuario(usuario_id, payload) {
+    const {
+      nombre,
+      apellido,
+      nombre_usuario,
+      contrasenia,
+      tipo_usuario,
+      celular,
+      foto
+    } = payload;
 
-    const exist = await this.model.obtenerPorNombreUsuario(limpio.nombre_usuario);
-    if (exist && exist.length && Number(exist[0].usuario_id) !== Number(usuario_id)) {
+    // confirmar que el usuario existe
+    const actual = await this.model.obtenerUsuarioPorId(usuario_id);
+    if (!actual || actual.length === 0) {
+      const err = new Error("Usuario no encontrado.");
+      err.status = 404;
+      throw err;
+    }
+
+    // validar que no choque nombre_usuario con otro usuario distinto
+    const posibleDuplicado = await this.model.obtenerPorNombreUsuario(
+      String(nombre_usuario).trim().toLowerCase()
+    );
+    if (
+      posibleDuplicado &&
+      posibleDuplicado.length &&
+      Number(posibleDuplicado[0].usuario_id) !== Number(usuario_id)
+    ) {
       const err = new Error("El nombre de usuario ya existe");
       err.status = 400;
       throw err;
     }
 
+    // si mandan contraseña nueva la hasheamos, si no mandan dejamos null para que el DAO no la toque
+    const nuevaPassHasheada =
+      contrasenia && String(contrasenia).trim() !== ""
+        ? hashContrasenia(String(contrasenia).trim())
+        : null;
+
     const result = await this.model.actualizarUsuario(usuario_id, {
-      ...limpio,
-      contrasenia: limpio.contrasenia ? hashContrasenia(limpio.contrasenia) : null
+      nombre: String(nombre).trim(),
+      apellido: String(apellido).trim(),
+      nombre_usuario: String(nombre_usuario).trim().toLowerCase(),
+      contrasenia: nuevaPassHasheada,
+      tipo_usuario: Number(tipo_usuario),
+      celular: celular != null ? String(celular).trim() : null,
+      foto: foto != null ? String(foto).trim() : null
     });
 
-    if (result.affectedRows === 0) {
-      const err = new Error("Usuario no encontrado o inactivo");
+    if (!result || result.affectedRows === 0) {
+      const err = new Error("Usuario no encontrado.");
       err.status = 404;
       throw err;
     }
   }
 
-  async eliminar(usuario_id) {
-    const result = await this.model.eliminarUsuario(usuario_id);
-    if (result.affectedRows === 0) {
-      const err = new Error("Usuario no encontrado");
+  async eliminarUsuario(usuario_id) {
+    // confirmo que exista
+    const actual = await this.model.obtenerUsuarioPorId(usuario_id);
+    if (!actual || actual.length === 0) {
+      const err = new Error("Usuario no encontrado.");
       err.status = 404;
       throw err;
     }
+
+    const result = await this.model.eliminarUsuario(usuario_id);
+    if (!result || result.affectedRows === 0) {
+      const err = new Error("Usuario no encontrado.");
+      err.status = 404;
+      throw err;
+    }
+
+    return true;
   }
 }
