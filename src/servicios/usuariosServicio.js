@@ -2,9 +2,7 @@ import crypto from "crypto";
 import Usuarios from "../db/usuarios.js";
 
 function hashContrasenia(plain) {
-  const salt = crypto.randomBytes(16).toString("hex");
-  const h = crypto.createHash("sha256").update(salt + plain).digest("hex");
-  return `${salt}$${h}`;
+  return crypto.createHash("sha256").update(plain).digest("hex");
 }
 
 export default class UsuariosServicio {
