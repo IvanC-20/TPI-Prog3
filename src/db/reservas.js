@@ -96,15 +96,37 @@ export default class Reservas {
     return result; 
   }
 
-  datosParaNotificacion = async(reserva_id) => {
-    const sql = `CALL obtenerDatosNotificacion(?)`;
-    
-    const [reserva] = await conexion.execute(sql, [reserva_id]);
-    if(reserva.length === 0){
-        return null;
-    }
-
-    return reserva;
- }
+  // por ahora hacemos una query para obtener todos los mails a los que vamos a enviar correo de la reserva generada
+  datosParaNotificacion = async (reserva_id) => {
+    const sqlReserva = `
+      SELECT 
+        r.fecha_reserva AS fecha,
+        s.titulo        AS salon,
+        CONCAT(
+          LPAD(t.hora_desde, 5, '0'), ' - ', LPAD(t.hora_hasta, 5, '0')
+        ) AS turno,
+        u.nombre_usuario AS correoCliente
+      FROM reservas r
+      JOIN salones s ON s.salon_id = r.salon_id
+      JOIN turnos  t ON t.turno_id = r.turno_id
+      JOIN usuarios u ON u.usuario_id = r.usuario_id
+      WHERE r.reserva_id = ?
+        AND r.activo = 1
+        AND u.activo = 1
+    `;
+    const [reservaRows] = await conexion.execute(sqlReserva, [reserva_id]);
+    // chequear que tipo de usuario es admin, un detalle
+    const sqlAdmins = `
+      SELECT nombre_usuario AS correoAdmin
+      FROM usuarios
+      WHERE activo = 1
+        AND tipo_usuario = 1 
+        AND nombre_usuario LIKE '%@%'
+    `;
+    const [adminRows] = await conexion.execute(sqlAdmins);
+  
+    return [reservaRows, adminRows];
+  };
+  
 
 }

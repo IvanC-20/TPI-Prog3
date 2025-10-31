@@ -1,13 +1,13 @@
 import Reservas from "../db/reservas.js";
 import ReservasServicios from "../db/reservas_servicios.js";
-import NotificacionesService from "./notificacionesServicio.js";
+import NotificacionesServicio from "./notificacionesServicio.js";
 
 export default class ReservasServicio {
 
     constructor() {
         this.reserva = new Reservas();
         this.reservas_servicios = new ReservasServicios();
-        this.notificacioes_servicios = new NotificacionesService();
+        this.notificaciones_servicio = new NotificacionesServicio();
     }
 
     buscarTodos = (usuario) => {
@@ -48,22 +48,23 @@ export default class ReservasServicio {
 
         // creamos la reserva
         const result = await this.reserva.crearReserva(nuevaReserva);
-
+       
         if (!result) {
             return null;
         }
-
+       
         // relacion reservas_servicios
         await this.reservas_servicios.crear(result.reserva_id, servicios);     
-        
-        // notify
+       
+       // notify
         try {
-            // busco datos para el envío
             const datosParaNotificacion = await this.reserva.datosParaNotificacion(result.reserva_id);
+            const envioOK = await this.notificaciones_servicio.enviarCorreo(datosParaNotificacion);
+            console.log("Notify: enviando mails OK.");
+
+        } catch (notificationError) {
+            console.log("Advertencia: No se pudo enviar el/los correo/s.");
         
-            await this.notificacioes_servicios.enviarCorreo(datosParaNotificacion);
-        } catch (notificationError) {            
-            console.log('Advertencia: No se pudo enviar el correo.');
         }
 
         // reserva creada
@@ -106,9 +107,10 @@ export default class ReservasServicio {
 
         try {
             const datosParaNotificacion = await this.reserva.datosParaNotificacion(reserva_id);
-            await this.notificaciones_servicios.enviarCorreo(datosParaNotificacion);
+            await this.notificaciones_servicio.enviarCorreo(datosParaNotificacion);
+            console.log("Notify: enviando mails.");
         } catch (notificationError) {
-            console.log("Advertencia: No se pudo enviar el correo.");
+            console.log("Advertencia: No se pudo enviar el/los correo/s.");
         }
 
         return this.reserva.obtenerReservaPorId(reserva_id);

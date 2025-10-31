@@ -4,59 +4,76 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import handlebars from 'handlebars';
 
-export default class NotificacionesService {
+export default class NotificacionesServicio {
 
-    enviarCorreo = async (datosCorreo) => {        
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
-        const plantillaPath = path.join(__dirname, '../utiles/handlebars/plantilla.hbs');
-        const plantilla = fs.readFileSync(plantillaPath, 'utf-8');
+  enviarCorreo = async (datosCorreo) => {
+    try {
+      // 1. Cargar plantilla handlebars
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      const plantillaPath = path.join(__dirname, '../utils/handlebars/plantilla.hbs');
 
-        const template = handlebars.compile(plantilla);
-        
-        const datos = {
-            fecha: datosCorreo[0].map(a => a.fecha),
-            salon: datosCorreo[0].map(a => a.salon),
-            turno: datosCorreo[0].map(a => a.turno)
-        };
+      const plantilla = fs.readFileSync(plantillaPath, 'utf-8');
+      const template = handlebars.compile(plantilla);
 
-        const correoHtml = template(datos);
-        
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.CORREO,
-                pass: process.env.CLAVE
-            }
-        });
+      // 2. Armar datos para la plantilla
+      const datosReserva = datosCorreo?.[0] ?? [];
+      const datosAdmins = datosCorreo?.[1] ?? [];
 
-        // CORREOS DE LOS ADMINISTRADORES
-        const correosAdmin = datosCorreo[1].map(a => a.correoAdmin);
-        // SEPARO POR COMA PARA AGREGAR A LAS OPCIONES DEL ENVIO
-        const destinatarios = correosAdmin.join(', ');
+      const datos = {
+        fecha: datosReserva.map(a => a.fecha),
+        salon: datosReserva.map(a => a.salon),
+        turno: datosReserva.map(a => a.turno)
+      };
 
-        const mailOptions = {
-            from: process.env.CORREO,
-            to: destinatarios,
-            // cc: clientes/admin
-            subject: "Nueva Reserva",
-            html: correoHtml
-        };
-        
-        transporter.sendMail(mailOptions, (error, info) => {
-            if(error){
-                console.log(`Error enviado el correo`, error);       
-                return false;
-            }
-            return true;
-        });
-    }
+      const correoHtml = template(datos);
 
-    // OTROS TIPOS DE NOTIFICACION
-    enviarMensaje = async (datos) => {} 
+      // 3. Crear transporter Gmail
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.USERCORREO,
+          pass: process.env.PASSCORREO
+        }
+      });
+
+      await transporter.verify();
+
+      // 4. Destinatarios
+      const correosCliente = datosReserva
+      .map(r => r.correoCliente)
+      .filter(c => !!c && c.includes('@'));
     
-    enviarWhatsapp = async (datos) => {} 
+      const correosAdmin = datosAdmins
+        .map(a => a.correoAdmin)
+        .filter(c => !!c && c.includes('@'));
+      
+      const todosLosDestinatarios = Array.from(
+        new Set([...correosCliente, ...correosAdmin])
+      ).join(', ');
+      
+      const mailOptions = {
+        from: process.env.USERCORREO,
+        to: todosLosDestinatarios,
+        subject: "Nueva Reserva",
+        html: correoHtml
+      };
 
-    enviarNotificacionPush = async (datos) => {} 
+      // 5. Enviar mail y esperar resultado
+      const info = await transporter.sendMail(mailOptions);
 
+      console.log("Correo enviado OK. messageId =", info.messageId);
+      return true;
+
+    } catch (err) {
+      console.error("Error enviando correo:", err);
+      // re-lanzamos para que el caller (ReservasServicio) pueda loguear "no se pudo enviar correo"
+      throw err;
+    }
+  };
+
+  // placeholders (todavía sin implementación)
+  enviarMensaje = async (datos) => {};
+  enviarWhatsapp = async (datos) => {};
+  enviarNotificacionPush = async (datos) => {};
 }
