@@ -7,6 +7,14 @@ import TurnosControlador from '../../controladores/turnosControlador.js';
 const router = express.Router();
 const turnosControlador = new TurnosControlador();
 
+// Rutas de turnos
+// Roles: 1 = Administrador, 2 = Empleado, 3 = Cliente
+// Permisos:
+// - GET (listar o ver turno): roles [1, 2, 3]
+// - POST (crear turno): roles [1, 2]
+// - PUT (editar turno): roles [1, 2]
+// - DELETE (eliminar turno): roles [1, 2]
+
 router.get('/:turno_id',
   autorizarUsuarios([1,2,3]),
   turnosControlador.obtenerTurnoPorId
@@ -18,12 +26,12 @@ router.get('/',
 );
 
 router.delete('/:turno_id',
-  autorizarUsuarios([1,3]),
+  autorizarUsuarios([1,2]),
   turnosControlador.eliminarTurno
 );
 
 router.post('/',
-  autorizarUsuarios([1,3]),
+  autorizarUsuarios([1,2]),
   [
     check('orden', 'El orden es obligatorio y debe ser un entero > 0')
       .notEmpty()
@@ -39,7 +47,7 @@ router.post('/',
 );
 
 router.put('/:turno_id',
-  autorizarUsuarios([1,3]),
+  autorizarUsuarios([1,2]),
   [
     check('orden', 'El orden es obligatorio y debe ser un entero > 0')
       .notEmpty()

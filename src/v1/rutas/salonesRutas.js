@@ -7,12 +7,20 @@ import SalonesControlador from '../../controladores/salonesControlador.js';
 const salonesControlador = new SalonesControlador();
 const router = express.Router();
 
+// Rutas de salones
+// Roles: 1 = Administrador, 2 = Empleado, 3 = Cliente
+// Permisos:
+// - GET (listar o ver salón): roles [1, 2, 3]
+// - POST (crear salón): roles [1, 2]
+// - PUT (editar salón): roles [1, 2]
+// - DELETE (eliminar salón): roles [1, 2]
+
 router.get('/:salon_id', autorizarUsuarios([1,2,3]), salonesControlador.obtenerSalonPorId);
 router.get('/', autorizarUsuarios([1,2,3]), salonesControlador.buscarTodos);
-router.delete('/:salon_id', autorizarUsuarios([1,3]), salonesControlador.eliminarSalon);
+router.delete('/:salon_id', autorizarUsuarios([1,2]), salonesControlador.eliminarSalon);
 
 router.post('/',
-    autorizarUsuarios([1,3]),
+    autorizarUsuarios([1,2]),
     [
         check('titulo', 'El título es obligatorio').notEmpty().isLength({ min: 3 }).withMessage('El título debe tener al menos 3 caracteres'),
         check('direccion', 'La dirección es obligatoria').notEmpty(),
@@ -30,7 +38,7 @@ router.post('/',
 );
 
 router.put('/:salon_id',
-    autorizarUsuarios([1,3]),
+    autorizarUsuarios([1,2]),
     [
         check('titulo', 'El título es obligatorio').notEmpty().isLength({ min: 3 }).withMessage('El título debe tener al menos 3 caracteres'),
         check('direccion', 'La dirección es obligatoria').notEmpty(),

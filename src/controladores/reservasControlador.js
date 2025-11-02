@@ -5,9 +5,9 @@ export default class ReservasControlador {
     this.servicio = new ReservasServicio();
   }
 
-  buscarTodos = async (_req, res) => {
+  buscarTodos = async (req, res) => {
     try {
-      const reservas = await this.servicio.buscarTodos(_req.user);
+      const reservas = await this.servicio.buscarTodos(req.user);
       return res.json({ estado: true, reservas });
     } catch (error) {
       return res
@@ -19,17 +19,29 @@ export default class ReservasControlador {
   obtenerReservaPorId = async (req, res) => {
     try {
       const { reserva_id } = req.params;
-      const reserva = await this.servicio.buscarPorId(Number(reserva_id));
-      if (!reserva) {
+      const usuario = req.user;
+  
+      const reservas = await this.servicio.buscarPorId(Number(reserva_id));
+      if (!reservas || reservas.length === 0) {
         return res.status(404).json({ estado: false, mensaje: "Reserva no encontrada." });
       }
+  
+      const reserva = reservas[0];
+  
+      if (usuario.tipo_usuario === 3 && reserva.usuario_id !== usuario.usuario_id) {
+        return res.status(403).json({
+          estado: false,
+          mensaje: "No tiene permiso para ver esta reserva."
+        });
+      }
+  
       return res.json({ estado: true, reserva });
     } catch (error) {
       return res
         .status(error.status || 400)
         .json({ estado: false, mensaje: error.message, errores: error.errores });
     }
-  };
+  };  
 
   crearReserva = async (req, res) => {
     try {

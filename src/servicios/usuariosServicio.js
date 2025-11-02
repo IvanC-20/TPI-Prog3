@@ -30,6 +30,10 @@ export default class UsuariosServicio {
     return datos[0];
   }
 
+  async buscarSoloClientes() {
+    return this.model.buscarSoloClientes();
+  }
+
   async crearUsuario(payload) {
     const {
       nombre,

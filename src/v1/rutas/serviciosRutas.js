@@ -7,12 +7,20 @@ import ServiciosControlador from '../../controladores/serviciosControlador.js';
 const serviciosControlador = new ServiciosControlador();
 const router = express.Router();
 
+// Rutas de servicios
+// Roles: 1 = Administrador, 2 = Empleado, 3 = Cliente
+// Permisos:
+// - GET (listar o ver servicio): roles [1, 2, 3]
+// - POST (crear servicio): roles [1, 2]
+// - PUT (editar servicio): roles [1, 2]
+// - DELETE (eliminar servicio): roles [1, 2]
+
 router.get('/:servicio_id', autorizarUsuarios([1,2,3]), serviciosControlador.obtenerServicioPorId);
 router.get('/', autorizarUsuarios([1,2,3]), serviciosControlador.buscarTodos);
-router.delete('/:servicio_id', autorizarUsuarios([1,3]), serviciosControlador.eliminarServicio);
+router.delete('/:servicio_id', autorizarUsuarios([1,2]), serviciosControlador.eliminarServicio);
 
 router.post('/',
-    autorizarUsuarios([1,3]),
+    autorizarUsuarios([1,2]),
     [
         check('descripcion', 'La descripción es obligatoria')
             .notEmpty()
@@ -28,7 +36,7 @@ router.post('/',
 );
 
 router.put('/:servicio_id',
-    autorizarUsuarios([1,3]),
+    autorizarUsuarios([1,2]),
     [
         check('descripcion', 'La descripción es obligatoria')
             .notEmpty()

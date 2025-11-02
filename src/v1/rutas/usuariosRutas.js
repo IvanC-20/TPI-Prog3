@@ -7,27 +7,40 @@ import UsuariosControlador from '../../controladores/usuariosControlador.js';
 const router = express.Router();
 const usuariosControlador = new UsuariosControlador();
 
+// Rutas de usuarios
+// Roles: 1 = Administrador, 2 = Empleado, 3 = Cliente
+// Permisos:
+// - GET / (listar usuarios): roles [1, 2]
+//      * El rol 1 ve todos los usuarios
+//      * El rol 2 solo ve los clientes (tipo_usuario = 3)
+// - GET /:usuario_id (ver usuario): roles [1, 2]
+//      * El rol 1 puede ver cualquier usuario
+//      * El rol 2 solo puede ver si el usuario es cliente
+// - POST (crear usuario): rol [1]
+// - PUT (editar usuario): rol [1]
+// - DELETE (eliminar usuario): rol [1]
+
 router.get(
   '/:usuario_id',
-  autorizarUsuarios([1,2,3]),
+  autorizarUsuarios([1,2]),
   usuariosControlador.obtenerUsuarioPorId
 );
 
 router.get(
   '/',
-  autorizarUsuarios([1,2,3]),
+  autorizarUsuarios([1,2]),
   usuariosControlador.buscarTodos
 );
 
 router.delete(
   '/:usuario_id',
-  autorizarUsuarios([1,3]),
+  autorizarUsuarios([1]),
   usuariosControlador.eliminarUsuario
 );
 
 router.post(
   '/',
-  autorizarUsuarios([1,3]),
+  autorizarUsuarios([1]),
   [
     check('nombre', 'El nombre es obligatorio')
       .notEmpty()
@@ -61,7 +74,7 @@ router.post(
 
 router.put(
   '/:usuario_id',
-  autorizarUsuarios([1,3]),
+  autorizarUsuarios([1]),
   [
     check('nombre', 'El nombre es obligatorio')
       .notEmpty()
