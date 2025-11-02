@@ -34,7 +34,7 @@ export default class UsuariosControlador {
   obtenerUsuarioPorId = async (req, res) => {
     try {
       const { usuario_id } = req.params;
-      const rol = req.usuario?.tipo_usuario;
+      const rol = req.user?.tipo_usuario;
   
       const usuario = await this.servicio.obtenerUsuarioPorId(Number(usuario_id));
   
