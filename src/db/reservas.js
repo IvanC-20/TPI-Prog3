@@ -2,35 +2,162 @@ import { conexion } from "./conexion.js";
 
 export default class Reservas {
 
-  buscarPropias = async(usuario_id) => {
-    const sql = 'SELECT * FROM reservas WHERE activo = 1 AND usuario_id = ?';
-    const [reservas] = await conexion.execute(sql, [usuario_id]);
-    return reservas;
+  async serviciosPorReserva(reserva_id) {
+    const sql = `
+      SELECT 
+        rs.servicio_id,
+        sv.descripcion,
+        rs.importe
+      FROM reservas_servicios rs
+      JOIN servicios sv ON sv.servicio_id = rs.servicio_id
+      WHERE rs.reserva_id = ?
+        AND sv.activo = 1
+    `;
+    const [rows] = await conexion.execute(sql, [reserva_id]);
+    return rows.map(s => ({
+      servicio_id: s.servicio_id,
+      descripcion: s.descripcion,
+      importe: s.importe
+    }));
   }
-  
+
+  armarReservaJson(row, servicios) {
+    return {
+      reserva_id: row.reserva_id,
+      fecha_reserva: row.fecha_reserva,
+      foto_cumpleaniero: row.foto_cumpleaniero,
+      tematica: row.tematica,
+      creado: row.creado,
+      modificado: row.modificado,
+      importe_salon: row.importe_salon,
+      importe_total: row.importe_total,
+      salon: {
+        salon_id: row.salon_id,
+        titulo: row.salon_titulo,
+        direccion: row.salon_direccion
+      },
+      turno: {
+        turno_id: row.turno_id,
+        hora_desde: row.hora_desde,
+        hora_hasta: row.hora_hasta
+      },
+      usuario: {
+        usuario_id: row.usuario_id,
+        nombre: row.usuario_nombre,
+        apellido: row.usuario_apellido,
+        celular: row.usuario_celular
+      },
+      servicios
+    };
+  }
+
+  buscarPropias = async (usuario_id) => {
+    const sql = `
+      SELECT 
+        r.reserva_id,
+        r.fecha_reserva,
+        r.salon_id,
+        r.usuario_id,
+        r.turno_id,
+        r.foto_cumpleaniero,
+        r.tematica,
+        r.importe_salon,
+        r.importe_total,
+        r.creado,
+        r.modificado,
+        s.titulo AS salon_titulo,
+        s.direccion AS salon_direccion,
+        t.hora_desde,
+        t.hora_hasta,
+        u.nombre AS usuario_nombre,
+        u.apellido AS usuario_apellido,
+        u.celular AS usuario_celular
+      FROM reservas r
+      JOIN salones s ON s.salon_id = r.salon_id
+      JOIN turnos t ON t.turno_id = r.turno_id
+      JOIN usuarios u ON u.usuario_id = r.usuario_id
+      WHERE r.activo = 1 AND r.usuario_id = ?
+      ORDER BY r.fecha_reserva DESC, r.creado DESC
+    `;
+    const [rows] = await conexion.execute(sql, [usuario_id]);
+    const resultado = [];
+    for (const row of rows) {
+      const servicios = await this.serviciosPorReserva(row.reserva_id);
+      resultado.push(this.armarReservaJson(row, servicios));
+    }
+    return resultado;
+  }
+
   async buscarTodos() {
     const sql = `
-      SELECT reserva_id, fecha_reserva, salon_id, usuario_id, turno_id,
-             foto_cumpleaniero, tematica, importe_salon, importe_total,
-             creado, modificado
-      FROM reservas
-      WHERE activo = 1
-      ORDER BY fecha_reserva DESC, creado DESC
+      SELECT 
+        r.reserva_id,
+        r.fecha_reserva,
+        r.salon_id,
+        r.usuario_id,
+        r.turno_id,
+        r.foto_cumpleaniero,
+        r.tematica,
+        r.importe_salon,
+        r.importe_total,
+        r.creado,
+        r.modificado,
+        s.titulo AS salon_titulo,
+        s.direccion AS salon_direccion,
+        t.hora_desde,
+        t.hora_hasta,
+        u.nombre AS usuario_nombre,
+        u.apellido AS usuario_apellido,
+        u.celular AS usuario_celular
+      FROM reservas r
+      JOIN salones s ON s.salon_id = r.salon_id
+      JOIN turnos t ON t.turno_id = r.turno_id
+      JOIN usuarios u ON u.usuario_id = r.usuario_id
+      WHERE r.activo = 1
+      ORDER BY r.fecha_reserva DESC, r.creado DESC
     `;
     const [rows] = await conexion.execute(sql);
-    return rows;
+    const resultado = [];
+    for (const row of rows) {
+      const servicios = await this.serviciosPorReserva(row.reserva_id);
+      resultado.push(this.armarReservaJson(row, servicios));
+    }
+    return resultado;
   }
 
   async obtenerReservaPorId(reserva_id) {
     const sql = `
-      SELECT reserva_id, fecha_reserva, salon_id, usuario_id, turno_id,
-             foto_cumpleaniero, tematica, importe_salon, importe_total,
-             creado, modificado
-      FROM reservas
-      WHERE activo = 1 AND reserva_id = ?
+      SELECT 
+        r.reserva_id,
+        r.fecha_reserva,
+        r.salon_id,
+        r.usuario_id,
+        r.turno_id,
+        r.foto_cumpleaniero,
+        r.tematica,
+        r.importe_salon,
+        r.importe_total,
+        r.creado,
+        r.modificado,
+        s.titulo AS salon_titulo,
+        s.direccion AS salon_direccion,
+        t.hora_desde,
+        t.hora_hasta,
+        u.nombre AS usuario_nombre,
+        u.apellido AS usuario_apellido,
+        u.celular AS usuario_celular
+      FROM reservas r
+      JOIN salones s ON s.salon_id = r.salon_id
+      JOIN turnos t ON t.turno_id = r.turno_id
+      JOIN usuarios u ON u.usuario_id = r.usuario_id
+      WHERE r.activo = 1 AND r.reserva_id = ?
+      LIMIT 1
     `;
     const [rows] = await conexion.execute(sql, [reserva_id]);
-    return rows;
+    if (rows.length === 0) return [];
+    const row = rows[0];
+    const servicios = await this.serviciosPorReserva(reserva_id);
+    return [this.armarReservaJson(row, servicios)];
   }
 
   async crearReserva({
@@ -115,7 +242,7 @@ export default class Reservas {
         AND u.activo = 1
     `;
     const [reservaRows] = await conexion.execute(sqlReserva, [reserva_id]);
-    // chequear que tipo de usuario es admin, un detalle
+  
     const sqlAdmins = `
       SELECT nombre_usuario AS correoAdmin
       FROM usuarios

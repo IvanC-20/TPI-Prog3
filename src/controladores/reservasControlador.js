@@ -28,7 +28,7 @@ export default class ReservasControlador {
   
       const reserva = reservas[0];
   
-      if (usuario.tipo_usuario === 3 && reserva.usuario_id !== usuario.usuario_id) {
+      if (usuario.tipo_usuario === 3 && reserva.usuario.usuario_id !== usuario.usuario_id) {
         return res.status(403).json({
           estado: false,
           mensaje: "No tiene permiso para ver esta reserva."
