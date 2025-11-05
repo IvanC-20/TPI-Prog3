@@ -2,6 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import morgan from 'morgan';
 import fs from 'fs';  
+import swaggerUi from "swagger-ui-express";
 
 import { estrategia, validacion} from './config/passport.js';
 import { router as v1SalonesRutas } from './v1/rutas/salonesRutas.js';
@@ -10,8 +11,13 @@ import { router as v1TurnosRutas } from './v1/rutas/turnosRutas.js';
 import { router as v1UsuariosRutas } from './v1/rutas/usuariosRutas.js';
 import { router as v1ReservasRutas } from './v1/rutas/reservasRutas.js';
 import { router as v1AuthRouter} from './v1/rutas/authRoutes.js';
+import { buildSwaggerSpec } from "./docs/swagger.js";
 
 const app = express();
+
+// swagger
+const swaggerSpec = buildSwaggerSpec();
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // passport
 app.use(passport.initialize());

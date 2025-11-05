@@ -1,3 +1,76 @@
+/**
+ * @openapi
+ * tags:
+ *   - name: Servicios
+ *     description: Gestión de servicios
+ */
+
+/**
+ * @openapi
+ * /servicios:
+ *   get:
+ *     summary: Lista servicios (1,2,3).
+ *     tags: [Servicios]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: OK }
+ *   post:
+ *     summary: Crea servicio (solo 1,2).
+ *     tags: [Servicios]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { $ref: "#/components/schemas/Servicio" }
+ *     responses:
+ *       201: { description: Creado }
+ */
+
+/**
+ * @openapi
+ * /servicios/{servicio_id}:
+ *   get:
+ *     summary: Obtiene servicio por ID (1,2,3).
+ *     tags: [Servicios]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: servicio_id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200: { description: OK }
+ *       404: { description: No encontrado }
+ *   put:
+ *     summary: Edita servicio (solo 1,2).
+ *     tags: [Servicios]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: servicio_id
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { $ref: "#/components/schemas/Servicio" }
+ *     responses:
+ *       200: { description: Actualizado }
+ *   delete:
+ *     summary: Borra servicio (soft delete) (solo 1,2).
+ *     tags: [Servicios]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: servicio_id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       204: { description: Eliminado }
+ */
+
 import express from 'express';
 import { check } from 'express-validator';
 import { validarCampos } from '../../middlewares/validarCampos.js';

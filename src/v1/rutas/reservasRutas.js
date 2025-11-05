@@ -1,3 +1,75 @@
+/**
+ * @openapi
+ * tags:
+ *   - name: Reservas
+ *     description: "Gestión de reservas (solo roles 1=Admin, 2=Empleado)"
+ */
+
+/**
+ * @openapi
+ * /reservas:
+ *   get:
+ *     summary: Lista todas las reservas.
+ *     description: "Admin (1) y Empleado (2) pueden ver todas."
+ *     tags: [Reservas]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: OK
+ *   post:
+ *     summary: Crea una reserva.
+ *     description: "Solo Admin (1) y Cliente (3) pueden crear (excluido Empleado)."
+ *     tags: [Reservas]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Reserva"
+ *     responses:
+ *       201:
+ *         description: Creado
+ *
+ * /reservas/{reserva_id}:
+ *   get:
+ *     summary: Obtiene una reserva por ID.
+ *     description: "Admin (1) y Empleado (2) pueden ver todas; Cliente (3) solo las suyas."
+ *     tags: [Reservas]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: reserva_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: OK
+ *   put:
+ *     summary: Actualiza una reserva.
+ *     description: "Solo Admin (1) puede modificar."
+ *     tags: [Reservas]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Reserva"
+ *     responses:
+ *       200:
+ *         description: Actualizado
+ *   delete:
+ *     summary: Elimina (soft delete) una reserva.
+ *     description: "Solo Admin (1) puede eliminar."
+ *     tags: [Reservas]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       204:
+ *         description: Eliminado
+ */
+
 import express from 'express';
 import { check } from 'express-validator';
 import { validarCampos } from '../../middlewares/validarCampos.js';
