@@ -1,3 +1,76 @@
+/**
+ * @openapi
+ * tags:
+ *   - name: Turnos
+ *     description: Gestión de turnos
+ */
+
+/**
+ * @openapi
+ * /turnos:
+ *   get:
+ *     summary: Lista turnos (1,2,3).
+ *     tags: [Turnos]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: OK }
+ *   post:
+ *     summary: Crea turno (solo 1,2).
+ *     tags: [Turnos]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { $ref: "#/components/schemas/Turno" }
+ *     responses:
+ *       201: { description: Creado }
+ */
+
+/**
+ * @openapi
+ * /turnos/{turno_id}:
+ *   get:
+ *     summary: Obtiene turno por ID (1,2,3).
+ *     tags: [Turnos]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: turno_id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200: { description: OK }
+ *       404: { description: No encontrado }
+ *   put:
+ *     summary: Edita turno (solo 1,2).
+ *     tags: [Turnos]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: turno_id
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { $ref: "#/components/schemas/Turno" }
+ *     responses:
+ *       200: { description: Actualizado }
+ *   delete:
+ *     summary: Borra turno (soft delete) (solo 1,2).
+ *     tags: [Turnos]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: turno_id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       204: { description: Eliminado }
+ */
+
 import express from 'express';
 import { check } from 'express-validator';
 import autorizarUsuarios from '../../middlewares/autorizarUsuarios.js';

@@ -1,3 +1,76 @@
+/**
+ * @openapi
+ * tags:
+ *   - name: Usuarios
+ *     description: "Gestión de usuarios"
+ */
+
+/**
+ * @openapi
+ * /usuarios:
+ *   get:
+ *     summary: Lista usuarios (Admin=1 ve todos; Empleado=2 solo clientes).
+ *     tags: [Usuarios]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: OK }
+ *   post:
+ *     summary: Crea un usuario (solo Admin=1).
+ *     tags: [Usuarios]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { $ref: "#/components/schemas/Usuario" }
+ *     responses:
+ *       201: { description: Creado }
+ */
+
+/**
+ * @openapi
+ * /usuarios/{usuario_id}:
+ *   get:
+ *     summary: Obtiene un usuario por ID.
+ *     tags: [Usuarios]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: usuario_id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200: { description: OK }
+ *       404: { description: No encontrado }
+ *   put:
+ *     summary: Actualiza un usuario (solo Admin=1).
+ *     tags: [Usuarios]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: usuario_id
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { $ref: "#/components/schemas/Usuario" }
+ *     responses:
+ *       200: { description: Actualizado }
+ *   delete:
+ *     summary: Elimina un usuario (soft delete) (solo Admin=1).
+ *     tags: [Usuarios]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: usuario_id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       204: { description: Eliminado }
+ */
+
 import express from 'express';
 import { check } from 'express-validator';
 import autorizarUsuarios from '../../middlewares/autorizarUsuarios.js';

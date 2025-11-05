@@ -1,0 +1,124 @@
+import swaggerJSDoc from "swagger-jsdoc";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const swaggerDefinition = {
+  openapi: "3.0.3",
+  info: {
+    title: "API Reservas – TPI-Prog3 – Grupo AP",
+    version: "1.0.0",
+    description:
+      "API REST con JWT. Y Roles (1=Admin, 2=Empleado, 3=Cliente). BREAD de Usuarios, Turnos, Servicios, Salones y Reservas.",
+  },
+  servers: [
+    { url: "http://localhost:3000/api/v1", description: "Local" },
+  ],
+  components: {
+    securitySchemes: {
+      bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+    },
+    schemas: {
+      Usuario: {
+        type: "object",
+        required: ["nombre", "apellido", "nombre_usuario", "tipo_usuario"],
+        properties: {
+          usuario_id: { type: "integer" },
+          nombre: { type: "string" },
+          apellido: { type: "string" },
+          nombre_usuario: { type: "string", example: "admin@example.com" },
+          contrasenia: { type: "string" },
+          tipo_usuario: {
+            type: "integer",
+            example: 3,
+            description: "1=Admin, 2=Empleado, 3=Cliente",
+          },
+          celular: { type: "string" },
+          foto: { type: ["string", "null"] },
+          activo: { type: "integer", example: 1 },
+        },
+      },
+      Turno: {
+        type: "object",
+        required: ["orden", "hora_desde", "hora_hasta"],
+        properties: {
+          turno_id: { type: "integer" },
+          orden: { type: "integer" },
+          hora_desde: { type: "string", example: "10:00:00" },
+          hora_hasta: { type: "string", example: "12:00:00" },
+          activo: { type: "integer", example: 1 },
+        },
+      },
+      Servicio: {
+        type: "object",
+        required: ["descripcion", "importe"],
+        properties: {
+          servicio_id: { type: "integer" },
+          descripcion: { type: "string" },
+          importe: { type: "number" },
+          activo: { type: "integer", example: 1 },
+        },
+      },
+      Salon: {
+        type: "object",
+        required: ["titulo", "direccion", "capacidad", "importe"],
+        properties: {
+          salon_id: { type: "integer" },
+          titulo: { type: "string" },
+          direccion: { type: "string" },
+          latitud: { type: ["number", "null"] },
+          longitud: { type: ["number", "null"] },
+          capacidad: { type: "integer" },
+          importe: { type: "number" },
+          activo: { type: "integer", example: 1 },
+        },
+      },
+      ReservaServicio: {
+        type: "object",
+        required: ["servicio_id", "importe"],
+        properties: {
+          servicio_id: { type: "integer" },
+          importe: { type: "number" },
+        },
+      },
+      Reserva: {
+        type: "object",
+        required: [
+          "fecha_reserva",
+          "salon_id",
+          "usuario_id",
+          "turno_id",
+          "importe_salon",
+          "importe_total",
+        ],
+        properties: {
+          reserva_id: { type: "integer" },
+          fecha_reserva: { type: "string", example: "2025-12-10" },
+          salon_id: { type: "integer" },
+          usuario_id: { type: "integer" },
+          turno_id: { type: "integer" },
+          foto_cumpleaniero: { type: ["string", "null"] },
+          tematica: { type: ["string", "null"] },
+          importe_salon: { type: "number" },
+          importe_total: { type: "number" },
+          servicios: {
+            type: "array",
+            items: { $ref: "#/components/schemas/ReservaServicio" },
+          },
+          activo: { type: "integer", example: 1 },
+        },
+      },
+    },
+  },
+};
+
+export function buildSwaggerSpec() {
+    return swaggerJSDoc({
+      definition: swaggerDefinition,
+      apis: [
+        "./src/v1/rutas/*.js"
+      ],
+    });
+  }
