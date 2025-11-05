@@ -8,7 +8,7 @@ export default class ServiciosContolador {
   buscarTodos = async (req, res) => {
     try {
       const servicios = await this.servicio.buscarTodos();
-      res.json({ estado: true, datos: servicios });
+      res.json({ estado: true, servicios: servicios });
     } catch (error) {
       console.log("Error en GET /servicios", error);
       res.status(error.status || 500).json({
@@ -34,11 +34,11 @@ export default class ServiciosContolador {
 
   crearServicio = async (req, res) => {
     try {
-      const id = await this.servicio.crearServicio(req.body);
+      const servicio = await this.servicio.crearServicio(req.body);
       res.status(201).json({
         estado: true,
-        mensaje: `Servicio creado con id: ${id}`,
-        servicio_id: id
+        mensaje: `Servicio creado correctamente.`,
+        servicio: servicio
       });
     } catch (error) {
       console.log("Error en POST /servicios", error);

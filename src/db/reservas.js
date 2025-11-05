@@ -21,36 +21,6 @@ export default class Reservas {
     }));
   }
 
-  armarReservaJson(row, servicios) {
-    return {
-      reserva_id: row.reserva_id,
-      fecha_reserva: row.fecha_reserva,
-      foto_cumpleaniero: row.foto_cumpleaniero,
-      tematica: row.tematica,
-      creado: row.creado,
-      modificado: row.modificado,
-      importe_salon: row.importe_salon,
-      importe_total: row.importe_total,
-      salon: {
-        salon_id: row.salon_id,
-        titulo: row.salon_titulo,
-        direccion: row.salon_direccion
-      },
-      turno: {
-        turno_id: row.turno_id,
-        hora_desde: row.hora_desde,
-        hora_hasta: row.hora_hasta
-      },
-      usuario: {
-        usuario_id: row.usuario_id,
-        nombre: row.usuario_nombre,
-        apellido: row.usuario_apellido,
-        celular: row.usuario_celular
-      },
-      servicios
-    };
-  }
-
   buscarPropias = async (usuario_id) => {
     const sql = `
       SELECT 
@@ -83,7 +53,7 @@ export default class Reservas {
     const resultado = [];
     for (const row of rows) {
       const servicios = await this.serviciosPorReserva(row.reserva_id);
-      resultado.push(this.armarReservaJson(row, servicios));
+      resultado.push({ ...row, servicios }); 
     }
     return resultado;
   }
@@ -120,7 +90,7 @@ export default class Reservas {
     const resultado = [];
     for (const row of rows) {
       const servicios = await this.serviciosPorReserva(row.reserva_id);
-      resultado.push(this.armarReservaJson(row, servicios));
+      resultado.push({ ...row, servicios }); 
     }
     return resultado;
   }
@@ -157,7 +127,7 @@ export default class Reservas {
     if (rows.length === 0) return [];
     const row = rows[0];
     const servicios = await this.serviciosPorReserva(reserva_id);
-    return [this.armarReservaJson(row, servicios)];
+    return [{ ...row, servicios }]; 
   }
 
   async crearReserva({
@@ -223,7 +193,6 @@ export default class Reservas {
     return result; 
   }
 
-  // por ahora hacemos una query para obtener todos los mails a los que vamos a enviar correo de la reserva generada
   datosParaNotificacion = async (reserva_id) => {
     const sqlReserva = `
       SELECT 
@@ -254,6 +223,4 @@ export default class Reservas {
   
     return [reservaRows, adminRows];
   };
-  
-
 }

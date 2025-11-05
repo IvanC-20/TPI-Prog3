@@ -21,7 +21,7 @@ export default class UsuariosControlador {
         });
       }
   
-      return res.json({ estado: true, datos: usuarios });
+      return res.json({ estado: true, usuarios: usuarios });
     } catch (error) {
       console.log("Error en GET /usuarios", error);
       return res.status(error.status || 500).json({
@@ -62,14 +62,14 @@ export default class UsuariosControlador {
 
   crearUsuario = async (req, res) => {
     try {
-      const id = await this.servicio.crearUsuario(req.body);
+      const usuario = await this.servicio.crearUsuario(req.body);
 
       return res
         .status(201)
         .json({
           estado: true,
-          mensaje: `Usuario creado con id: ${id}`,
-          usuario_id: id
+          mensaje: `Usuario creado correctamente.`,
+          usuario: usuario
         });
     } catch (error) {
       console.log("Error en POST /usuarios", error);
