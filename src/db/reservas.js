@@ -127,6 +127,12 @@ export default class Reservas {
   
     return [reservaRows, adminRows];
   };
+
+  sp_Ingresos_por_Salon = async() => { 
+    const sql = `CALL sp_ingresos_por_salon();`;
+    const [result] = await conexion.query(sql);
+    return result [0]; 
+  }
   
 
 }

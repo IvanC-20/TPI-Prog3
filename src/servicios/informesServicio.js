@@ -1,7 +1,6 @@
-import { createObjectCSvWriter } from "csv-writer";
+import { createObjectCsvWriter } from "csv-writer";
 import path from "path";
 import { fileURLToPath } from "url";
-import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,8 +8,8 @@ const __dirname = path.dirname(__filename);
 export default class InformesServicio{
     async csv_InformeIngresosSalon(datosReporte) {
         try {
-            let ruta = path.resolve(__dirname, '../utiles');
-            ruta = path.join(ruta, 'ingresos_por_salon.cvs');
+            let ruta = path.resolve(__dirname, '../utils');
+            ruta = path.join(ruta, 'ingresos_por_salon.csv');
 
              const csvWriter = createObjectCsvWriter({
                 path: ruta,

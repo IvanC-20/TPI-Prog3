@@ -7,6 +7,7 @@ import ReservasControlador from '../../controladores/reservasControlador.js';
 const reservasControlador = new ReservasControlador();
 const router = express.Router();
 
+router.get('/informe',autorizarUsuarios([1]), reservasControlador.informeIngresos);  
 router.get('/:reserva_id',  autorizarUsuarios([1,2,3]), reservasControlador.obtenerReservaPorId);
 router.get('/',  autorizarUsuarios([1,2,3]), reservasControlador.buscarTodos);
 router.delete("/:reserva_id", autorizarUsuarios([1,3]), reservasControlador.eliminarReserva);

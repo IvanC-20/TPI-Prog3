@@ -78,4 +78,27 @@ export default class ReservasControlador {
         .json({ estado: false, mensaje: error.message, errores: error.errores });
     }
   };
+
+  informeIngresos = async (req, res) =>  {
+    try {
+        const { path, headers } = await this.servicio.crearInforme_Ingresos();
+
+        res.set(headers);
+        res.status(200).download(path, (err) => {
+            if (err) {
+                return res.status(500).send({
+                    estado: "Falla",
+                    mensaje: "No se pudo generar el informe."
+                });
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            estado: "Falla",
+            mensaje: "Error interno en servidor."
+        });
+    }
+  };
 }

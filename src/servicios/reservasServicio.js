@@ -1,6 +1,7 @@
 import Reservas from "../db/reservas.js";
 import ReservasServicios from "../db/reservas_servicios.js";
 import NotificacionesServicio from "./notificacionesServicio.js";
+import InformesServicio from "./informesServicio.js";
 
 export default class ReservasServicio {
 
@@ -8,6 +9,7 @@ export default class ReservasServicio {
         this.reserva = new Reservas();
         this.reservas_servicios = new ReservasServicios();
         this.notificaciones_servicio = new NotificacionesServicio();
+        this.informes = new InformesServicio
     }
 
     buscarTodos = (usuario) => {
@@ -125,4 +127,17 @@ export default class ReservasServicio {
 
         return true;
     }
+
+    crearInforme_Ingresos = async () => {
+        const datos = await this.reserva.sp_Ingresos_por_Salon();
+        const rutaCsv = await this.informes.csv_InformeIngresosSalon(datos);
+        return  {
+            path: rutaCsv,
+            headers: {
+                'Content-Type': 'text/csv',
+                'Content-Disposition': 'attachment; filename="ingresos_por_salon.csv"'
+            }
+        }
+    }
+
 }
