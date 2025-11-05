@@ -15,7 +15,7 @@
  *     responses:
  *       200: { description: OK }
  *   post:
- *     summary: Crea un usuario (solo Admin=1).
+ *     summary: Crea un usuario (solo 1).
  *     tags: [Usuarios]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
@@ -31,7 +31,7 @@
  * @openapi
  * /usuarios/{usuario_id}:
  *   get:
- *     summary: Obtiene un usuario por ID.
+ *     summary: Obtiene un usuario por ID (Admin=1 ve el user; Empleado=2 ve el user solo si es cliente).
  *     tags: [Usuarios]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -43,7 +43,7 @@
  *       200: { description: OK }
  *       404: { description: No encontrado }
  *   put:
- *     summary: Actualiza un usuario (solo Admin=1).
+ *     summary: Actualiza un usuario (solo 1).
  *     tags: [Usuarios]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -59,7 +59,7 @@
  *     responses:
  *       200: { description: Actualizado }
  *   delete:
- *     summary: Elimina un usuario (soft delete) (solo Admin=1).
+ *     summary: Elimina un usuario (soft delete) (solo 1).
  *     tags: [Usuarios]
  *     security: [{ bearerAuth: [] }]
  *     parameters:

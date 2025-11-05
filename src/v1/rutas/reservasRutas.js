@@ -2,14 +2,14 @@
  * @openapi
  * tags:
  *   - name: Reservas
- *     description: "Gestión de reservas (solo roles 1=Admin, 2=Empleado)"
+ *     description: "Gestión de reservas"
  */
 
 /**
  * @openapi
  * /reservas:
  *   get:
- *     summary: Lista todas las reservas.
+ *     summary: Lista todas las reservas (1,2,3).
  *     description: "Admin (1) y Empleado (2) pueden ver todas."
  *     tags: [Reservas]
  *     security: [{ bearerAuth: [] }]
@@ -17,7 +17,7 @@
  *       200:
  *         description: OK
  *   post:
- *     summary: Crea una reserva.
+ *     summary: Crea una reserva (solo 1,3).
  *     description: "Solo Admin (1) y Cliente (3) pueden crear (excluido Empleado)."
  *     tags: [Reservas]
  *     security: [{ bearerAuth: [] }]
@@ -33,7 +33,7 @@
  *
  * /reservas/{reserva_id}:
  *   get:
- *     summary: Obtiene una reserva por ID.
+ *     summary: Obtiene una reserva por ID (1,2,3).
  *     description: "Admin (1) y Empleado (2) pueden ver todas; Cliente (3) solo las suyas."
  *     tags: [Reservas]
  *     security: [{ bearerAuth: [] }]
@@ -47,7 +47,7 @@
  *       200:
  *         description: OK
  *   put:
- *     summary: Actualiza una reserva.
+ *     summary: Actualiza una reserva (solo 1).
  *     description: "Solo Admin (1) puede modificar."
  *     tags: [Reservas]
  *     security: [{ bearerAuth: [] }]
@@ -61,7 +61,7 @@
  *       200:
  *         description: Actualizado
  *   delete:
- *     summary: Elimina (soft delete) una reserva.
+ *     summary: Elimina (soft delete) una reserva (solo 1).
  *     description: "Solo Admin (1) puede eliminar."
  *     tags: [Reservas]
  *     security: [{ bearerAuth: [] }]
