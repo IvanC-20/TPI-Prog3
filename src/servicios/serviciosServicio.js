@@ -1,4 +1,7 @@
 import Servicios from "../db/servicios.js";
+import dayjs from "dayjs";
+import "dayjs/locale/es.js";
+dayjs.locale("es");
 
 export default class ServiciosServicio {
   constructor() {
@@ -6,7 +9,12 @@ export default class ServiciosServicio {
   }
 
   async buscarTodos() {
-    return await this.model.buscarTodos();
+    const rows = await this.model.buscarTodos();
+    return rows.map(servicio => ({
+      ...servicio,
+      creado: servicio.creado ? dayjs(servicio.creado).format("DD/MM/YYYY HH:mm") : null,
+      modificado: servicio.modificado ? dayjs(servicio.modificado).format("DD/MM/YYYY HH:mm") : null
+    }));
   }
 
   async obtenerServicioPorId(servicio_id) {
@@ -16,7 +24,13 @@ export default class ServiciosServicio {
       err.status = 404;
       throw err;
     }
-    return datos[0];
+
+    const servicio = datos[0];
+    return {
+      ...servicio,
+      creado: servicio.creado ? dayjs(servicio.creado).format("DD/MM/YYYY HH:mm") : null,
+      modificado: servicio.modificado ? dayjs(servicio.modificado).format("DD/MM/YYYY HH:mm") : null
+    };
   }
 
   async crearServicio(payload) {
@@ -34,12 +48,19 @@ export default class ServiciosServicio {
       throw err;
     }
 
+    const ahora = new Date();
     const result = await this.model.crearServicio({
       descripcion: String(descripcion).trim(),
       importe: Number(importe)
     });
 
-    return result.insertId;
+    return {
+      servicio_id: result.insertId,
+      descripcion: String(descripcion).trim(),
+      importe: Number(importe),
+      creado: dayjs(ahora).format("DD/MM/YYYY HH:mm"),
+      modificado: dayjs(ahora).format("DD/MM/YYYY HH:mm")
+    };
   }
 
   async actualizarServicio(servicio_id, payload) {
@@ -64,6 +85,7 @@ export default class ServiciosServicio {
       throw err;
     }
 
+    const ahora = new Date();
     const result = await this.model.actualizarServicio(servicio_id, {
       descripcion: String(descripcion).trim(),
       importe: Number(importe)
@@ -74,6 +96,13 @@ export default class ServiciosServicio {
       err.status = 404;
       throw err;
     }
+
+    return {
+      servicio_id,
+      descripcion: String(descripcion).trim(),
+      importe: Number(importe),
+      modificado: dayjs(ahora).format("DD/MM/YYYY HH:mm")
+    };
   }
 
   async eliminarServicio(servicio_id) {

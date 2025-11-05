@@ -2,6 +2,9 @@ import Reservas from "../db/reservas.js";
 import ReservasServicios from "../db/reservas_servicios.js";
 import NotificacionesServicio from "./notificacionesServicio.js";
 import InformesServicio from "./informesServicio.js";
+import dayjs from "dayjs";
+import "dayjs/locale/es.js";
+dayjs.locale("es");
 
 export default class ReservasServicio {
 
@@ -12,16 +15,30 @@ export default class ReservasServicio {
         this.informes = new InformesServicio
     }
 
-    buscarTodos = (usuario) => {
+    buscarTodos = async (usuario) => {
+        let reservas;
         if (usuario.tipo_usuario < 3) {
-            return this.reserva.buscarTodos();
+            reservas = await this.reserva.buscarTodos();
         } else {
-            return this.reserva.buscarPropias(usuario.usuario_id);
+            reservas = await this.reserva.buscarPropias(usuario.usuario_id);
         }
+
+        const resultado = [];
+        for (const row of reservas) {
+        const servicios = await this.reserva.serviciosPorReserva(row.reserva_id);
+        resultado.push(this.armarReservaJson(row, servicios));
+        }
+        return resultado;
+
     }
 
-    buscarPorId = (reserva_id) => {
-        return this.reserva.obtenerReservaPorId(reserva_id);
+    buscarPorId = async (reserva_id) => {
+        const reservas = await this.reserva.obtenerReservaPorId(reserva_id);
+        if (!reservas || reservas.length === 0) return [];
+        
+        const row = reservas[0];
+        const servicios = await this.reserva.serviciosPorReserva(reserva_id);
+        return [this.armarReservaJson(row, servicios)];
     }
 
     crear = async (reserva) => {
@@ -70,7 +87,11 @@ export default class ReservasServicio {
         }
 
         // reserva creada
-        return this.reserva.obtenerReservaPorId(result.reserva_id);
+        const reservas = await this.reserva.obtenerReservaPorId(result.reserva_id);
+        const row = reservas[0];
+        const serviciosReserva = await this.reserva.serviciosPorReserva(result.reserva_id);
+        return [this.armarReservaJson(row, serviciosReserva)];
+
     }
 
     actualizar = async (reserva_id, reserva) => {
@@ -115,7 +136,10 @@ export default class ReservasServicio {
             console.log("Advertencia: No se pudo enviar el/los correo/s.");
         }
 
-        return this.reserva.obtenerReservaPorId(reserva_id);
+        const reservas = await this.reserva.obtenerReservaPorId(reserva_id);
+        const row = reservas[0];
+        const serviciosReserva = await this.reserva.serviciosPorReserva(reserva_id);
+        return [this.armarReservaJson(row, serviciosReserva)];
     }
 
     eliminar = async (reserva_id) => {

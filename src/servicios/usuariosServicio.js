@@ -1,5 +1,8 @@
 import crypto from "crypto";
 import Usuarios from "../db/usuarios.js";
+import dayjs from "dayjs";
+import "dayjs/locale/es.js";
+dayjs.locale("es");
 
 function hashContrasenia(plain) {
   return crypto.createHash("sha256").update(plain).digest("hex");
@@ -12,7 +15,12 @@ export default class UsuariosServicio {
 
   // para listar todos los usuarios activos
   async buscarTodos() {
-    return this.model.buscarTodos();
+    const rows = await this.model.buscarTodos();
+    return rows.map(u => ({
+      ...u,
+      creado: u.creado ? dayjs(u.creado).format("DD/MM/YYYY HH:mm") : null,
+      modificado: u.modificado ? dayjs(u.modificado).format("DD/MM/YYYY HH:mm") : null
+    }));
   }
 
   // se usa con auth
@@ -27,7 +35,21 @@ export default class UsuariosServicio {
       err.status = 404;
       throw err;
     }
-    return datos[0];
+    const u = datos[0];
+    return {
+      ...u,
+      creado: u.creado ? dayjs(u.creado).format("DD/MM/YYYY HH:mm") : null,
+      modificado: u.modificado ? dayjs(u.modificado).format("DD/MM/YYYY HH:mm") : null
+    };
+  }
+
+  async buscarSoloClientes() {
+    const rows = await this.model.buscarSoloClientes();
+    return rows.map(u => ({
+      ...u,
+      creado: u.creado ? dayjs(u.creado).format("DD/MM/YYYY HH:mm") : null,
+      modificado: u.modificado ? dayjs(u.modificado).format("DD/MM/YYYY HH:mm") : null
+    }));
   }
 
   async crearUsuario(payload) {
@@ -61,7 +83,18 @@ export default class UsuariosServicio {
       foto: foto != null ? String(foto).trim() : null
     });
 
-    return result.insertId;
+    const ahora = new Date();
+    return {
+      usuario_id: result.insertId,
+      nombre: String(nombre).trim(),
+      apellido: String(apellido).trim(),
+      nombre_usuario: String(nombre_usuario).trim().toLowerCase(),
+      tipo_usuario: Number(tipo_usuario),
+      celular: celular != null ? String(celular).trim() : null,
+      foto: foto != null ? String(foto).trim() : null,
+      creado: dayjs(ahora).format("DD/MM/YYYY HH:mm"),
+      modificado: dayjs(ahora).format("DD/MM/YYYY HH:mm")
+    };
   }
 
   async actualizarUsuario(usuario_id, payload) {
@@ -118,6 +151,19 @@ export default class UsuariosServicio {
       err.status = 404;
       throw err;
     }
+
+    // devolvemos objeto con modificado formateado
+    const ahora = new Date();
+    return {
+      usuario_id,
+      nombre: String(nombre).trim(),
+      apellido: String(apellido).trim(),
+      nombre_usuario: String(nombre_usuario).trim().toLowerCase(),
+      tipo_usuario: Number(tipo_usuario),
+      celular: celular != null ? String(celular).trim() : null,
+      foto: foto != null ? String(foto).trim() : null,
+      modificado: dayjs(ahora).format("DD/MM/YYYY HH:mm")
+    };
   }
 
   async eliminarUsuario(usuario_id) {

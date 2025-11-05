@@ -13,6 +13,7 @@
   "dependencies": {
     "csv-writer": "^1.6.0",
     "dotenv": "^17.2.3",
+    "dayjs": "^1.11.19",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "handlebars": "^4.7.8",
@@ -22,6 +23,8 @@
     "nodemailer": "^7.0.6",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }

@@ -5,47 +5,71 @@ export default class UsuariosControlador {
     this.servicio = new UsuariosServicio();
   }
 
-  buscarTodos = async (_req, res) => {
+  buscarTodos = async (req, res) => {
     try {
-      const usuarios = await this.servicio.buscarTodos();
-      return res.json({ estado: true, datos: usuarios });
+      const rol = req.user?.tipo_usuario;
+  
+      let usuarios;
+      if (rol === 1) {
+        usuarios = await this.servicio.buscarTodos();
+      } else if (rol === 2) {
+        usuarios = await this.servicio.buscarSoloClientes();
+      } else {
+        return res.status(403).json({
+          estado: false,
+          mensaje: "No tiene permiso para acceder a la lista de usuarios."
+        });
+      }
+  
+      return res.json({ estado: true, usuarios: usuarios });
     } catch (error) {
       console.log("Error en GET /usuarios", error);
-      return res
-        .status(error.status || 500)
-        .json({
-          estado: false,
-          mensaje: error.message || "Error interno del servidor."
-        });
+      return res.status(error.status || 500).json({
+        estado: false,
+        mensaje: error.message || "Error interno del servidor."
+      });
     }
-  };
+  };  
 
   obtenerUsuarioPorId = async (req, res) => {
     try {
       const { usuario_id } = req.params;
+      const rol = req.user?.tipo_usuario;
+  
       const usuario = await this.servicio.obtenerUsuarioPorId(Number(usuario_id));
-      return res.json({ estado: true, usuario });
+  
+      if (rol === 1) {
+        return res.json({ estado: true, usuario });
+      }
+  
+      if (rol === 2 && usuario.tipo_usuario === 3) {
+        return res.json({ estado: true, usuario });
+      }
+  
+      return res.status(403).json({
+        estado: false,
+        mensaje: "No tiene permiso para ver este usuario."
+      });
+  
     } catch (error) {
       console.log("Error en GET /usuarios/:usuario_id", error);
-      return res
-        .status(error.status || 404)
-        .json({
-          estado: false,
-          mensaje: error.message || "Usuario no encontrado."
-        });
+      return res.status(error.status || 404).json({
+        estado: false,
+        mensaje: error.message || "Usuario no encontrado."
+      });
     }
-  };
+  };  
 
   crearUsuario = async (req, res) => {
     try {
-      const id = await this.servicio.crearUsuario(req.body);
+      const usuario = await this.servicio.crearUsuario(req.body);
 
       return res
         .status(201)
         .json({
           estado: true,
-          mensaje: `Usuario creado con id: ${id}`,
-          usuario_id: id
+          mensaje: `Usuario creado correctamente.`,
+          usuario: usuario
         });
     } catch (error) {
       console.log("Error en POST /usuarios", error);

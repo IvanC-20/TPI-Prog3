@@ -5,10 +5,10 @@ export default class TurnosControlador {
     this.servicio = new TurnosServicio();
   }
 
-  buscarTodos = async (_req, res) => {
+  buscarTodos = async (req, res) => {
     try {
       const turnos = await this.servicio.buscarTodos();
-      return res.json({ estado: true, datos: turnos });
+      return res.json({ estado: true, turnos: turnos });
     } catch (error) {
       console.log("Error en GET /turnos", error);
       return res
@@ -32,13 +32,13 @@ export default class TurnosControlador {
 
   crearTurno = async (req, res) => {
     try {
-      const id = await this.servicio.crearTurno(req.body);
+      const turno = await this.servicio.crearTurno(req.body);
       return res
         .status(201)
         .json({
           estado: true,
-          mensaje: `Turno creado con id: ${id}`,
-          turno_id: id
+          mensaje: `Turno creado correctamente.`,
+          turno: turno
         });
     } catch (error) {
       console.log("Error en POST /turnos", error);

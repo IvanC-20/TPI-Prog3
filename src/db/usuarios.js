@@ -39,6 +39,17 @@ export default class Usuarios {
     return rows;
   }
 
+  async buscarSoloClientes() {
+    const sql = `
+      SELECT usuario_id, nombre, apellido, nombre_usuario, tipo_usuario, celular, foto
+      FROM usuarios
+      WHERE activo = 1 AND tipo_usuario = 3
+      ORDER BY apellido, nombre
+    `;
+    const [rows] = await conexion.execute(sql);
+    return rows;
+  }
+
   async crearUsuario({ nombre, apellido, nombre_usuario, contrasenia, tipo_usuario, celular, foto }) {
     const ahora = new Date();
     const sql = `

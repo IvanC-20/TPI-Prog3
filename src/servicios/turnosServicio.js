@@ -1,4 +1,7 @@
 import Turnos from "../db/turnos.js";
+import dayjs from "dayjs";
+import "dayjs/locale/es.js";
+dayjs.locale("es");
 
 export default class TurnosServicio {
   constructor() {
@@ -6,7 +9,12 @@ export default class TurnosServicio {
   }
 
   async buscarTodos() {
-    return this.model.buscarTodos();
+    const rows = await this.model.buscarTodos();
+    return rows.map(turno => ({
+      ...turno,
+      creado: turno.creado ? dayjs(turno.creado).format("DD/MM/YYYY HH:mm") : null,
+      modificado: turno.modificado ? dayjs(turno.modificado).format("DD/MM/YYYY HH:mm") : null
+    }));
   }
 
   async obtenerTurnoPorId(turno_id) {
@@ -16,7 +24,13 @@ export default class TurnosServicio {
       err.status = 404;
       throw err;
     }
-    return datos[0];
+
+    const turno = datos[0];
+    return {
+      ...turno,
+      creado: turno.creado ? dayjs(turno.creado).format("DD/MM/YYYY HH:mm") : null,
+      modificado: turno.modificado ? dayjs(turno.modificado).format("DD/MM/YYYY HH:mm") : null
+    };
   }
 
   async crearTurno(payload) {
@@ -34,13 +48,21 @@ export default class TurnosServicio {
       throw err;
     }
 
+    const ahora = new Date();
     const result = await this.model.crearTurno({
       orden: Number(orden),
       hora_desde: String(hora_desde),
       hora_hasta: String(hora_hasta)
     });
 
-    return result.insertId;
+    return {
+      turno_id: result.insertId,
+      orden: Number(orden),
+      hora_desde: String(hora_desde),
+      hora_hasta: String(hora_hasta),
+      creado: dayjs(ahora).format("DD/MM/YYYY HH:mm"),
+      modificado: dayjs(ahora).format("DD/MM/YYYY HH:mm")
+    };
   }
 
   async actualizarTurno(turno_id, payload) {
@@ -59,6 +81,7 @@ export default class TurnosServicio {
       throw err;
     }
 
+    const ahora = new Date();
     const result = await this.model.actualizarTurno(turno_id, {
       orden: Number(orden),
       hora_desde: String(hora_desde),
@@ -70,6 +93,14 @@ export default class TurnosServicio {
       err.status = 404;
       throw err;
     }
+
+    return {
+      turno_id,
+      orden: Number(orden),
+      hora_desde: String(hora_desde),
+      hora_hasta: String(hora_hasta),
+      modificado: dayjs(ahora).format("DD/MM/YYYY HH:mm")
+    };
   }
 
   async eliminarTurno(turno_id) {

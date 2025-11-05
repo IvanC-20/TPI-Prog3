@@ -9,7 +9,7 @@ export default class SalonesControlador {
   buscarTodos = async (req, res) => {
     try {
       const salones = await this.salonesServicio.buscarTodos();
-      res.json({ estado: true, datos: salones });
+      res.json({ estado: true, salones: salones });
       
     } catch (err) {
       console.log("Error en GET /salones", err);
@@ -40,7 +40,7 @@ export default class SalonesControlador {
       const salon = await this.salonesServicio.crearSalon(req.body);
       res.status(201).json({
         estado: true,
-        mensaje: `Salón creado con id: ${salon.id}`,
+        mensaje: `Salón creado correctamente.`,
         salon,
       });
 

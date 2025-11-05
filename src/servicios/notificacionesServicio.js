@@ -3,6 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import handlebars from 'handlebars';
+import dayjs from "dayjs";
+import "dayjs/locale/es.js";
+dayjs.locale("es");
 
 export default class NotificacionesServicio {
 
@@ -21,7 +24,7 @@ export default class NotificacionesServicio {
       const datosAdmins = datosCorreo?.[1] ?? [];
 
       const datos = {
-        fecha: datosReserva.map(a => a.fecha),
+        fecha: datosReserva.map(a => dayjs(a.fecha).format("DD/MM/YYYY")),
         salon: datosReserva.map(a => a.salon),
         turno: datosReserva.map(a => a.turno)
       };
@@ -55,7 +58,7 @@ export default class NotificacionesServicio {
       const mailOptions = {
         from: process.env.USERCORREO,
         to: todosLosDestinatarios,
-        subject: "Nueva Reserva",
+        subject: "Nueva Reserva 🎉",
         html: correoHtml
       };
 
