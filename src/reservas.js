@@ -12,7 +12,7 @@ import { router as v1UsuariosRutas } from './v1/rutas/usuariosRutas.js';
 import { router as v1ReservasRutas } from './v1/rutas/reservasRutas.js';
 import { router as v1AuthRouter} from './v1/rutas/authRoutes.js';
 import { buildSwaggerSpec } from "./docs/swagger.js";
-import { router as invitadosRouter } from "./v1/rutas/invitadosRutas.js";
+import { router as v1InvitadosRutas } from "./v1/rutas/invitadosRutas.js";
 
 
 const app = express();
@@ -40,7 +40,8 @@ app.use('/api/v1/turnos', passport.authenticate('jwt', { session:false }), v1Tur
 app.use('/api/v1/servicios', passport.authenticate('jwt', { session:false }), v1ServiciosRutas);
 app.use('/api/v1/salones', passport.authenticate( 'jwt', { session:false }), v1SalonesRutas);
 app.use('/api/v1/reservas', passport.authenticate( 'jwt', { session:false }), v1ReservasRutas);
-app.use("/api/v1/invitados", passport.authenticate( 'jwt', { session:false }), invitadosRouter);
+app.use("/api/v1/invitados", passport.authenticate( 'jwt', { session:false }), v1InvitadosRutas);
+app.get("/invitacion", v1InvitadosRutas);
 
 
 //cargamos las variables de entorno que estan definidas en el archivo .env (en el objeto process.env)

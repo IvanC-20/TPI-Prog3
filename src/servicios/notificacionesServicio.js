@@ -119,7 +119,7 @@ export default class NotificacionesServicio {
       `Te invito el día ${datos.reserva.fecha}` +
       (datos.reserva.hora ? ` a la hora ${datos.reserva.hora}` : "") +
       ` en ${datos.salon.titulo}${datos.salon.direccion ? " (" + datos.salon.direccion + ")" : ""}. ` +
-      `Confirmá tu asistencia: http://localhost:3000/invitados/confirmar?id=${datos.invitado.invitado_id}`;
+      `Confirmá tu asistencia: http://localhost:3000/invitacion/confirmar?id=${datos.invitado.invitado_id}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
