@@ -9,7 +9,7 @@
  * @openapi
  * /api/v1/invitados:
  *   get:
- *     summary: Lista todos los invitados (roles 1,2)
+ *     summary: Lista todos los invitados (roles 1,2,3)
  *     tags: [Invitados]
  *     security: [{ bearerAuth: [] }]
  *     responses:
@@ -128,5 +128,35 @@ router.delete(
   autorizarUsuarios([1, 2]),
   invitadosControlador.eliminarInvitado
 );
+
+/**
+ * @openapi
+ * /api/v1/invitados/notificar:
+ *   post:
+ *     summary: Envía invitación por mail a todos los invitados con notificado=0 de una reserva
+ *     tags: [Invitados]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [reserva_id]
+ *             properties:
+ *               reserva_id: { type: integer }
+ *     responses:
+ *       200: { description: OK }
+ */
+router.post(
+  "/notificar",
+  autorizarUsuarios([1,2]),
+  [ check("reserva_id", "reserva_id es obligatorio").notEmpty().isInt({ min: 1 }), validarCampos ],
+  invitadosControlador.notificarInvitados
+);
+
+// Link público desde el mail
+router.get("/confirmar", invitadosControlador.confirmarAsistencia);
+
 
 export { router };

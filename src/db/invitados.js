@@ -74,11 +74,45 @@ export default class Invitados {
     valores.push(invitado_id);
     await conexion.execute(sql, valores);
     return this.obtenerInvitadoPorId(invitado_id);
+    
   }
 
   async eliminarInvitado(invitado_id) {
     const sql = `UPDATE invitados SET activo = 0 WHERE invitado_id = ?`;
     const [result] = await conexion.execute(sql, [invitado_id]);
     return result;
+  }
+
+  async buscarConEmailPorReserva(reserva_id, soloPendientes = true) {
+    let sql = `
+      SELECT invitado_id, reserva_id, nombre, apellido, email,
+             confirmado, notificado, activo, creado, modificado
+      FROM invitados
+      WHERE activo = 1
+        AND reserva_id = ?
+        AND email IS NOT NULL
+        AND email <> ''
+    `;
+    const params = [reserva_id];
+    if (soloPendientes) sql += ` AND notificado = 0`;
+    sql += ` ORDER BY creado DESC, invitado_id DESC`;
+    const [rows] = await conexion.execute(sql, params);
+    return rows;
+  }
+
+  async marcarNotificado(invitado_id) {
+    const sql = `UPDATE invitados SET notificado = 1, modificado = NOW() WHERE invitado_id = ? AND activo = 1`;
+    const [res] = await conexion.execute(sql, [invitado_id]);
+    return res;
+  }
+
+  async marcarConfirmado(invitado_id) {
+    const sql = `
+      UPDATE invitados 
+      SET confirmado = 1, modificado = NOW()
+      WHERE invitado_id = ? AND activo = 1
+    `;
+    const [res] = await conexion.execute(sql, [invitado_id]);
+    return res;
   }
 }

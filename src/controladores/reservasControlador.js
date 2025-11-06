@@ -21,12 +21,10 @@ export default class ReservasControlador {
       const { reserva_id } = req.params;
       const usuario = req.user;
   
-      const reservas = await this.servicio.buscarPorId(Number(reserva_id));
-      if (!reservas || reservas.length === 0) {
+      const reserva = await this.servicio.buscarPorId(Number(reserva_id));
+      if (!reserva) {
         return res.status(404).json({ estado: false, mensaje: "Reserva no encontrada." });
       }
-  
-      const reserva = reservas[0];
   
       if (usuario.tipo_usuario === 3 && reserva.usuario.usuario_id !== usuario.usuario_id) {
         return res.status(403).json({

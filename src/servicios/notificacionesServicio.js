@@ -79,4 +79,72 @@ export default class NotificacionesServicio {
   enviarMensaje = async (datos) => {};
   enviarWhatsapp = async (datos) => {};
   enviarNotificacionPush = async (datos) => {};
+
+ 
+async enviarInvitacionCumple({ invitado, reserva, salon = {}, public_base_url = "http://localhost:3000" }) {
+  try {
+    // Validaciones mínimas
+    if (!invitado?.email || !invitado.email.includes("@")) {
+      console.warn("Invitado sin email válido, se omite:", invitado);
+      return false;
+    }
+
+    // 1) Armar datos tal como los usa la plantilla handlebars
+    const datos = {
+      invitado: {
+        invitado_id: invitado.invitado_id,
+        nombre: invitado.nombre || "Invitado",
+        email: invitado.email
+      },
+      reserva: {
+        fecha: dayjs(reserva.fecha).format("DD/MM/YYYY"),
+        hora: reserva.hora || "",
+        tematica: reserva.tematica || ""
+      },
+      salon: salon ? {
+        titulo: salon.titulo || "",
+        direccion: salon.direccion || ""
+      } : {},
+      public_base_url
+    };
+
+    // 2) Compilar plantilla
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const plantillaPath = path.join(__dirname, "../utils/handlebars/invitacion.hbs");
+    const plantilla = fs.readFileSync(plantillaPath, "utf-8");
+    const template = handlebars.compile(plantilla);
+    const html = template(datos);
+
+    // 3) Asunto cumpleañero
+    const subject = `🎂 Invitación: ${datos.reserva.fecha}${datos.reserva.hora ? " · " + datos.reserva.hora : ""} – ${datos.salon.titulo || "¡A festejar!"} 🎈`;
+
+    // 4) Transporter (Gmail)
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.USERCORREO,
+        pass: process.env.PASSCORREO
+      }
+    });
+    await transporter.verify();
+
+    // 5) Enviar
+    const info = await transporter.sendMail({
+      from: process.env.USERCORREO,
+      to: datos.invitado.email,
+      subject,
+      html
+    });
+
+    console.log(`📨 Invitación enviada a ${datos.invitado.email} (ID: ${datos.invitado.invitado_id}) → messageId=${info.messageId}`);
+    return true;
+
+  } catch (err) {
+    console.error("Error enviando invitación (cumple):", err);
+    throw err;
+  }
+}
+
+  
 }

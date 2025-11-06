@@ -38,7 +38,7 @@ export default class ReservasServicio {
         
         const row = reservas[0];
         const servicios = await this.reserva.serviciosPorReserva(reserva_id);
-        return [this.armarReservaJson(row, servicios)];
+        return this.armarReservaJson(row, servicios);
     }
 
     crear = async (reserva) => {
@@ -163,5 +163,35 @@ export default class ReservasServicio {
             }
         }
     }
+
+    armarReservaJson(row, servicios) {
+        return {
+          reserva_id: row.reserva_id,
+          fecha_reserva: dayjs(row.fecha_reserva).format("DD/MM/YYYY"),
+          foto_cumpleaniero: row.foto_cumpleaniero,
+          tematica: row.tematica,
+          creado: dayjs(row.creado).format("DD/MM/YYYY HH:mm"),
+          modificado: dayjs(row.modificado).format("DD/MM/YYYY HH:mm"),
+          importe_salon: row.importe_salon,
+          importe_total: row.importe_total,
+          salon: {
+            salon_id: row.salon_id,
+            titulo: row.salon_titulo,
+            direccion: row.salon_direccion
+          },
+          turno: {
+            turno_id: row.turno_id,
+            hora_desde: row.hora_desde,
+            hora_hasta: row.hora_hasta
+          },
+          usuario: {
+            usuario_id: row.usuario_id,
+            nombre: row.usuario_nombre,
+            apellido: row.usuario_apellido,
+            celular: row.usuario_celular
+          },
+          servicios
+        };
+      }
 
 }
