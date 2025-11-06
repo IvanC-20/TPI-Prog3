@@ -11,7 +11,7 @@ const swaggerDefinition = {
     title: "API Reservas – TPI-Prog3 – Grupo AP",
     version: "1.0.0",
     description:
-      "API REST con JWT. Y Roles (1=Admin, 2=Empleado, 3=Cliente). BREAD de Usuarios, Turnos, Servicios, Salones y Reservas.",
+      "API REST con JWT. Y Roles (1=Admin, 2=Empleado, 3=Cliente). BREAD de Usuarios, Turnos, Servicios, Salones y Reservas. Envío de de invitaciones por mail.",
   },
   servers: [
     { url: "http://localhost:3000/api/v1", description: "Local" },
