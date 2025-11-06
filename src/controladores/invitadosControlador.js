@@ -101,17 +101,17 @@ export default class InvitadosControlador {
         return this._html(res, 404, "Invitado no encontrado", "No pudimos encontrar tu invitación.");
       }
       if (resultado.estado === "ya_confirmado") {
-        return this._html(res, 200, "¡Ya habías confirmado! ✅", "Tu asistencia ya estaba registrada. ¡Gracias!");
+        return this._html(res, 200, "¡Ya habías confirmado!", "Tu asistencia ya estaba registrada. ¡Gracias!");
       }
       // confirmado_ok
-      return this._html(res, 200, "¡Confirmación registrada! ✅", "Gracias por confirmar tu asistencia. ¡Te esperamos!");
+      return this._html(res, 200, "¡Confirmación registrada!", "Gracias por confirmar tu asistencia. ¡Te esperamos!");
     } catch (e) {
       console.error("Error en confirmarAsistencia:", e);
       return this._html(res, 500, "Error", "Ocurrió un problema al registrar tu confirmación.");
     }
   };
   
-  // helper privado para responder HTML bonito (estilo igual al mail)
+  // helper para responder HTML bonito (estilo igual al mail)
   _html(res, status, titulo, subtitulo) {
     res.status(status).type("html").send(`
       <!DOCTYPE html>

@@ -1,18 +1,12 @@
 import Invitados from "../db/invitados.js";
-import ReservasServicio from "./reservasServicio.js";
 import NotificacionesServicio from "./notificacionesServicio.js";
-import SalonesServicio from "./salonesServicio.js";
-import TurnosServicio from "./turnosServicio.js";
 import dayjs from "dayjs";
 import "dayjs/locale/es.js";
 dayjs.locale("es");
 
 export default class InvitadosServicio {
   constructor() {
-    this.invitados = new Invitados();                
-    this.reservasServicio = new ReservasServicio();         
-    this.salonesServicio  = new SalonesServicio();          
-    this.turnosServicio   = new TurnosServicio();            
+    this.invitados = new Invitados();                          
     this.notificaciones_servicio = new NotificacionesServicio();
   }
 
@@ -49,14 +43,13 @@ export default class InvitadosServicio {
     };
   }
 
-  // POST /api/v1/invitados (reserva_id en body)
+  // POST /api/v1/invitados 
   async crear(data) {
     const { reserva_id, nombre, apellido, email, confirmado, notificado } = data || {};
     if (!reserva_id || !nombre) {
       throw new Error("reserva_id y nombre son obligatorios.");
     }
-
-    // Validar reserva existente (vía servicio)
+    
     const reserva = await this.reservas.obtenerReservaPorId(reserva_id);
     if (!reserva) throw new Error("La reserva especificada no existe.");
 
