@@ -83,7 +83,7 @@ PASSCORREO=clave
 
 ## 🗄️ Base de Datos
 
-Crear la base y tablas (MySQL/MariaDB). Adjuntamos en el directorio scripts, el Script del modelo de datos con las tablas y registros vistos en clase
+Crear la base y tablas (MySQL/MariaDB). Adjuntamos en el directorio scripts, el Script del modelo de datos con las tablas y registros vistos en clase (reservas_script.sql)
 
 Ejemplo de campos relevantes:
 
