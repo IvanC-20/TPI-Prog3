@@ -7,7 +7,7 @@
 
 /**
  * @openapi
- * /api/v1/invitados:
+ * /invitados:
  *   get:
  *     summary: Lista todos los invitados (roles 1,2,3)
  *     tags: [Invitados]
@@ -26,33 +26,105 @@
  *             type: object
  *             required: [reserva_id, nombre]
  *             properties:
- *               reserva_id: { type: integer }
- *               nombre: { type: string }
- *               apellido: { type: string }
- *               email: { type: string, format: email }
- *               confirmado: { type: boolean }
- *               notificado: { type: boolean }
+ *               reserva_id: { type: integer, example: 1 }
+ *               nombre: { type: string, example: "Invitado Demo" }
+ *               apellido: { type: string, example: "Prueba" }
+ *               email: { type: string, format: email, example: "invitado@ejemplo.com" }
+ *               confirmado: { type: boolean, example: false }
+ *               notificado: { type: boolean, example: false }
  *     responses:
  *       201: { description: Creado }
  *
- * /api/v1/invitados/{invitado_id}:
+ * /invitados/{invitado_id}:
  *   get:
  *     summary: Obtiene invitado por ID (roles 1,2,3)
  *     tags: [Invitados]
+ *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: invitado_id
  *         required: true
- *         schema: { type: integer }
+ *         schema: { type: integer, minimum: 1 }
  *     responses:
  *       200: { description: OK }
  *       404: { description: No encontrado }
  *   put:
  *     summary: Edita invitado (roles 1,2)
  *     tags: [Invitados]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: invitado_id
+ *         required: true
+ *         schema: { type: integer, minimum: 1 }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre: { type: string, example: "Invitado Editado" }
+ *               email: { type: string, format: email }
+ *               confirmado: { type: boolean }
+ *               notificado: { type: boolean }
+ *     responses:
+ *       200: { description: Actualizado }
  *   delete:
  *     summary: Elimina invitado (soft delete) (roles 1,2)
  *     tags: [Invitados]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: invitado_id
+ *         required: true
+ *         schema: { type: integer, minimum: 1 }
+ *     responses:
+ *       204: { description: Eliminado }
+ */
+
+/**
+ * @openapi
+ * /invitados/notificar:
+ *   post:
+ *     summary: Envía invitación por mail a todos los invitados con notificado=0 de una reserva
+ *     tags: [Invitados]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [reserva_id]
+ *             properties:
+ *               reserva_id: { type: integer, example: 1 }
+ *     responses:
+ *       200:
+ *         description: OK (detalle de envíos)
+ */
+
+/**
+ * @openapi
+ * /invitados/confirmar:
+ *   get:
+ *     summary: Link público para confirmar asistencia (NO requiere JWT)
+ *     description: Marca al invitado como confirmado=1 y devuelve una página HTML de éxito o error.
+ *     tags: [Invitados]
+ *     security: []   # <- IMPORTANTE: público
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema: { type: integer, example: 1 }
+ *         description: ID del invitado a confirmar.
+ *     responses:
+ *       200:
+ *         description: Confirmación realizada (HTML)
+ *       400:
+ *         description: Faltan parámetros
+ *       404:
+ *         description: Invitado no encontrado
  */
 
 import express from "express";
@@ -129,25 +201,6 @@ router.delete(
   invitadosControlador.eliminarInvitado
 );
 
-/**
- * @openapi
- * /api/v1/invitados/notificar:
- *   post:
- *     summary: Envía invitación por mail a todos los invitados con notificado=0 de una reserva
- *     tags: [Invitados]
- *     security: [{ bearerAuth: [] }]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [reserva_id]
- *             properties:
- *               reserva_id: { type: integer }
- *     responses:
- *       200: { description: OK }
- */
 router.post(
   "/notificar",
   autorizarUsuarios([1,2]),

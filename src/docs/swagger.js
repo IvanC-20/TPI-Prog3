@@ -110,15 +110,32 @@ const swaggerDefinition = {
           activo: { type: "integer", example: 1 },
         },
       },
+
+      Invitado: {
+        type: "object",
+        properties: {
+          invitado_id: { type: "integer", example: 1 },
+          reserva_id:  { type: "integer", example: 42 },
+          nombre:      { type: "string",  example: "Invitado Demo" },
+          apellido:    { type: ["string","null"], example: "Prueba" },
+          email:       { type: ["string","null"], format: "email", example: "demo@ejemplo.com" },
+          confirmado:  { type: "boolean", example: false }, // tinyint(1)
+          notificado:  { type: "boolean", example: false }, // tinyint(1)
+          activo:      { type: "integer", example: 1 },     // tinyint(1) soft delete
+          creado:      { type: "string", format: "date-time", example: "2025-11-06T12:34:56Z" },
+          modificado:  { type: ["string","null"], format: "date-time", example: "2025-11-06T12:45:10Z" }
+        },
+        required: ["reserva_id","nombre"]
+      }
     },
   },
 };
 
 export function buildSwaggerSpec() {
-    return swaggerJSDoc({
-      definition: swaggerDefinition,
-      apis: [
-        "./src/v1/rutas/*.js"
-      ],
-    });
-  }
+  return swaggerJSDoc({
+    definition: swaggerDefinition,
+    apis: [
+      "./src/v1/rutas/*.js"
+    ],
+  });
+}
