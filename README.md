@@ -160,5 +160,5 @@ Usar con fines académicos y educativos.
 
 ## 📬 Contacto
 
-- Repo: https://github.com/IvanC-20/TPI-Prog3/issues  
+- Repo: https://github.com/IvanC-20/TPI-Prog3
 - Equipo: ver lista de **Integrantes** arriba.
