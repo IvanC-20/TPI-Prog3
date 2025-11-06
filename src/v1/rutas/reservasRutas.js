@@ -26,7 +26,25 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/Reserva"
+ *             type: object
+ *             required: [fecha_reserva, salon_id, usuario_id, turno_id, importe_salon, importe_total, servicios]
+ *             properties:
+ *               fecha_reserva: { type: string, example: "2025-11-20" }
+ *               salon_id:      { type: integer, example: 3 }
+ *               usuario_id:    { type: integer, example: 16 }
+ *               turno_id:      { type: integer, example: 2 }
+ *               foto_cumpleaniero: { type: ["string","null"], example: null }
+ *               tematica:      { type: ["string","null"], example: "Aventura espacial" }
+ *               importe_salon: { type: number, example: 160000 }
+ *               importe_total: { type: number, example: 210000 }
+ *               servicios:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required: [servicio_id, importe]
+ *                   properties:
+ *                     servicio_id: { type: integer, example: 10 }
+ *                     importe:     { type: number, example: 50000 }
  *     responses:
  *       201:
  *         description: Creado
@@ -56,7 +74,23 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/Reserva"
+ *             type: object
+ *             properties:
+ *               fecha_reserva: { type: string, example: "2025-11-22" }
+ *               salon_id:      { type: integer, example: 4 }
+ *               usuario_id:    { type: integer, example: 7 }
+ *               turno_id:      { type: integer, example: 2 }
+ *               foto_cumpleaniero: { type: ["string","null"], example: null }
+ *               tematica:      { type: ["string","null"], example: "Aventura espacial (actualizada)" }
+ *               importe_salon: { type: number, example: 165000 }
+ *               importe_total: { type: number, example: 220000 }
+ *               servicios:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     servicio_id: { type: integer, example: 11 }
+ *                     importe:     { type: number, example: 10000 }
  *     responses:
  *       200:
  *         description: Actualizado

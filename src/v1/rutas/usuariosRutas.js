@@ -22,7 +22,17 @@
  *       required: true
  *       content:
  *         application/json:
- *           schema: { $ref: "#/components/schemas/Usuario" }
+ *           schema:
+ *             type: object
+ *             required: [nombre, apellido, nombre_usuario, contrasenia, tipo_usuario]
+ *             properties:
+ *               nombre:          { type: string, example: "Martina" }
+ *               apellido:        { type: string, example: "García" }
+ *               nombre_usuario:  { type: string, example: "martina.garcia@example.com" }
+ *               contrasenia:     { type: string, example: "martina1234" }
+ *               tipo_usuario:    { type: integer, example: 3, description: "1=Admin, 2=Empleado, 3=Cliente" }
+ *               celular:         { type: ["string","null"], example: "1122334455" }
+ *               foto:            { type: ["string","null"], example: null }
  *     responses:
  *       201: { description: Creado }
  */
@@ -54,8 +64,17 @@
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
- *           schema: { $ref: "#/components/schemas/Usuario" }
+ *          application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:          { type: string, example: "Martina" }
+ *               apellido:        { type: string, example: "García Pérez" }
+ *               nombre_usuario:  { type: string, example: "martina.actualizada@example.com" }
+ *               tipo_usuario:    { type: integer, example: 3 }
+ *               celular:         { type: ["string","null"], example: "1199887766" }
+ *               foto:            { type: ["string","null"], example: null }
+ *               contrasenia:     { type: string, example: "opcionalNuevaPass" }
  *     responses:
  *       200: { description: Actualizado }
  *   delete:

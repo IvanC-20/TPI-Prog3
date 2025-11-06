@@ -22,7 +22,13 @@
  *       required: true
  *       content:
  *         application/json:
- *           schema: { $ref: "#/components/schemas/Turno" }
+ *           schema:
+ *             type: object
+ *             required: [orden, hora_desde, hora_hasta]
+ *             properties:
+ *               orden:       { type: integer, example: 1 }
+ *               hora_desde:  { type: string, example: "10:00:00" }
+ *               hora_hasta:  { type: string, example: "12:00:00" }
  *     responses:
  *       201: { description: Creado }
  */
@@ -55,7 +61,12 @@
  *       required: true
  *       content:
  *         application/json:
- *           schema: { $ref: "#/components/schemas/Turno" }
+ *           schema:
+ *             type: object
+ *             properties:
+ *               orden:       { type: integer, example: 2 }
+ *               hora_desde:  { type: string, example: "12:00:00" }
+ *               hora_hasta:  { type: string, example: "14:00:00" }
  *     responses:
  *       200: { description: Actualizado }
  *   delete:

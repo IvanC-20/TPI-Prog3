@@ -22,7 +22,16 @@
  *       required: true
  *       content:
  *         application/json:
- *           schema: { $ref: "#/components/schemas/Salon" }
+ *           schema:
+ *             type: object
+ *             required: [titulo, direccion, capacidad, importe]
+ *             properties:
+ *               titulo:    { type: string, example: "Salón Los Jacarandás" }
+ *               direccion: { type: string, example: "Av. Libertador 1234, CABA" }
+ *               capacidad: { type: integer, example: 40 }
+ *               importe:   { type: number, example: 180000 }
+ *               latitud:   { type: ["number","null"], example: -34.6037 }
+ *               longitud:  { type: ["number","null"], example: -58.3816 }
  *     responses:
  *       201: { description: Creado }
  */
@@ -55,7 +64,13 @@
  *       required: true
  *       content:
  *         application/json:
- *           schema: { $ref: "#/components/schemas/Salon" }
+ *           schema:
+ *             type: object
+ *             properties:
+ *               titulo:    { type: string, example: "Salón Los Jacarandás (modificado)" }
+ *               direccion: { type: string, example: "Av. Libertador 1234, CABA" }
+ *               capacidad: { type: integer, example: 42 }
+ *               importe:   { type: number, example: 190000 }
  *     responses:
  *       200: { description: Actualizado }
  *   delete:

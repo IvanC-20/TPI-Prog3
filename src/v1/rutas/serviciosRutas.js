@@ -22,7 +22,12 @@
  *       required: true
  *       content:
  *         application/json:
- *           schema: { $ref: "#/components/schemas/Servicio" }
+ *           schema:
+ *             type: object
+ *             required: [descripcion, importe]
+ *             properties:
+ *               descripcion: { type: string, example: "Animación y juegos cooperativos" }
+ *               importe:     { type: number, example: 35000 }
  *     responses:
  *       201: { description: Creado }
  */
@@ -55,7 +60,11 @@
  *       required: true
  *       content:
  *         application/json:
- *           schema: { $ref: "#/components/schemas/Servicio" }
+ *           schema:
+ *             type: object
+ *             properties:
+ *               descripcion: { type: string, example: "Animación (actualizada) + búsqueda del tesoro" }
+ *               importe:     { type: number, example: 42000 }
  *     responses:
  *       200: { description: Actualizado }
  *   delete:

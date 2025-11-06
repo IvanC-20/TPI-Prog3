@@ -28,8 +28,8 @@
  *             properties:
  *               reserva_id: { type: integer, example: 1 }
  *               nombre: { type: string, example: "Soledad" }
- *               apellido: { type: string, example: "Spinnehirn" }
- *               email: { type: string, format: email, example: "soledad.spinnehirn@gmail.com" }
+ *               apellido: { type: string, example: "Spinnenhirn" }
+ *               email: { type: string, format: email, example: "soledad.spinnenhirn@gmail.com" }
  *               confirmado: { type: boolean, example: false }
  *               notificado: { type: boolean, example: false }
  *     responses:
@@ -65,7 +65,7 @@
  *             type: object
  *             properties:
  *               nombre: { type: string, example: "Sole" }
- *               email: { type: string, format: email, example: "soledad.spinnehirn@gmail.com" }
+ *               email: { type: string, format: email, example: "soledad.spinnenhirn@gmail.com" }
  *               confirmado: { type: boolean }
  *               notificado: { type: boolean }
  *     responses:
