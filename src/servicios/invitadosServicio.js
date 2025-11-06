@@ -1,5 +1,6 @@
 import Invitados from "../db/invitados.js";
 import NotificacionesServicio from "./notificacionesServicio.js";
+import ReservasServicio from "../servicios/reservasServicio.js";
 import dayjs from "dayjs";
 import "dayjs/locale/es.js";
 dayjs.locale("es");
@@ -8,6 +9,7 @@ export default class InvitadosServicio {
   constructor() {
     this.invitados = new Invitados();                          
     this.notificaciones_servicio = new NotificacionesServicio();
+    this.reservasServicio = new ReservasServicio();
   }
 
   // GET /api/v1/invitados
@@ -50,7 +52,7 @@ export default class InvitadosServicio {
       throw new Error("reserva_id y nombre son obligatorios.");
     }
     
-    const reserva = await this.reservas.obtenerReservaPorId(reserva_id);
+    const reserva = await this.reservasServicio.buscarPorId(reserva_id);
     if (!reserva) throw new Error("La reserva especificada no existe.");
 
     const ahora = new Date();

@@ -18,8 +18,8 @@
  *           schema:
  *             type: object
  *             properties:
- *               nombre_usuario: { type: string, example: "admin@example.com" }
- *               contrasenia: { type: string, example: "admin123" }
+ *               nombre_usuario: { type: string, example: "juan.perez1234@example.com" }
+ *               contrasenia: { type: string, example: "juan1234" }
  *     responses:
  *       200: { description: Token JWT generado correctamente }
  *       401: { description: Credenciales inválidas }

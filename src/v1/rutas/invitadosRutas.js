@@ -27,9 +27,9 @@
  *             required: [reserva_id, nombre]
  *             properties:
  *               reserva_id: { type: integer, example: 1 }
- *               nombre: { type: string, example: "Invitado Demo" }
- *               apellido: { type: string, example: "Prueba" }
- *               email: { type: string, format: email, example: "invitado@ejemplo.com" }
+ *               nombre: { type: string, example: "Soledad" }
+ *               apellido: { type: string, example: "Spinnehirn" }
+ *               email: { type: string, format: email, example: "soledad.spinnehirn@gmail.com" }
  *               confirmado: { type: boolean, example: false }
  *               notificado: { type: boolean, example: false }
  *     responses:
@@ -64,8 +64,8 @@
  *           schema:
  *             type: object
  *             properties:
- *               nombre: { type: string, example: "Invitado Editado" }
- *               email: { type: string, format: email }
+ *               nombre: { type: string, example: "Sole" }
+ *               email: { type: string, format: email, example: "soledad.spinnehirn@gmail.com" }
  *               confirmado: { type: boolean }
  *               notificado: { type: boolean }
  *     responses:
