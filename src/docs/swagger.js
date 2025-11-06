@@ -23,7 +23,7 @@ const swaggerDefinition = {
     schemas: {
       Usuario: {
         type: "object",
-        required: ["nombre", "apellido", "nombre_usuario", "tipo_usuario"],
+        required: ["nombre", "apellido", "nombre_usuario", "contrasenia", "tipo_usuario", "activo"],
         properties: {
           usuario_id: { type: "integer" },
           nombre: { type: "string" },
@@ -77,10 +77,11 @@ const swaggerDefinition = {
       },
       ReservaServicio: {
         type: "object",
-        required: ["servicio_id", "importe"],
+        required: ["reserva_id", "servicio_id", "importe"],
         properties: {
-          servicio_id: { type: "integer" },
-          importe: { type: "number" },
+          reserva_id: { type: "integer", example: 1, description: "FK a reservas.reserva_id" },
+          servicio_id: { type: "integer", example: 10, description: "FK a servicios.servicio_id" },
+          importe: { type: "number", example: 50000.00, description: "decimal(10,2)" },
         },
       },
       Reserva: {
