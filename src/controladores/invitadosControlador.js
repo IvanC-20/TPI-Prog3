@@ -60,7 +60,6 @@ export default class InvitadosControlador {
         });
       }
 
-      // ✅ mensaje de éxito al eliminar
       return res.json({
         estado: true,
         mensaje: "Invitado eliminado correctamente."
