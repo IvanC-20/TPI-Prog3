@@ -162,4 +162,4 @@ Usar con fines académicos y educativos.
 ## 📬 Contacto
 
 - Repo: https://github.com/IvanC-20/TPI-Prog3
-- Equipo: ver lista de **Integrantes** arriba.
+- GRUPO AP: ver lista de **Integrantes** arriba.
