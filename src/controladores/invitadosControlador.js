@@ -111,36 +111,84 @@ export default class InvitadosControlador {
     }
   };
   
-  // helper privado para responder HTML bonito
+  // helper privado para responder HTML bonito (estilo igual al mail)
   _html(res, status, titulo, subtitulo) {
     res.status(status).type("html").send(`
-      <!doctype html>
+      <!DOCTYPE html>
       <html lang="es">
       <head>
-        <meta charset="utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta charset="UTF-8" />
         <title>${titulo}</title>
         <style>
-          body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#fff5fb;}
-          .card{max-width:620px;margin:50px auto;background:#fff;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,.08);overflow:hidden;border:4px solid #ffd6ea}
-          header{background:linear-gradient(90deg,#ff94c2,#fbc687);color:#fff;padding:22px 28px;text-align:center}
-          h1{margin:0;font-size:24px}
-          .cnt{padding:28px;text-align:center;color:#333}
-          p{margin:10px 0 0}
-          .btn{display:inline-block;margin-top:18px;background:#ff5a9c;color:#fff;text-decoration:none;padding:12px 20px;border-radius:28px;font-weight:700}
+          body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background: linear-gradient(135deg, #c6fff2, #d7f8ff);
+            color: #1b1b1b;
+            text-align: center;
+            margin: 0;
+            padding: 50px 0;
+          }
+          .card {
+            max-width: 640px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 22px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            border: 3px solid #b5f5ec;
+            animation: fadeIn 0.6s ease;
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          header {
+            background: linear-gradient(90deg, #4cc9f0, #06d6a0);
+            color: #fff;
+            padding: 38px 20px;
+          }
+          header h1 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+          }
+          .content {
+            padding: 38px 35px 45px;
+          }
+          .bigline {
+            font-size: 19px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            color: #333;
+          }
+          footer {
+            background: #f8fffd;
+            color: #666;
+            padding: 16px;
+            font-size: 14px;
+            border-top: 1px solid #d9f8f4;
+          }
         </style>
       </head>
       <body>
         <div class="card">
-          <header><h1>${titulo}</h1></header>
-          <div class="cnt">
-            <p>${subtitulo}</p>
-            <a class="btn" href="/">Volver al sitio</a>
+          <header>
+            <h1>${titulo}</h1>
+          </header>
+
+          <div class="content">
+            <p class="bigline">${subtitulo}</p>
           </div>
+
+          <footer>
+            &copy; 2025 · ¡Te esperamos con alegría! 💙🌱
+          </footer>
         </div>
       </body>
       </html>
     `);
   }
+
   
 }
