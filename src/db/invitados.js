@@ -115,4 +115,62 @@ export default class Invitados {
     const [res] = await conexion.execute(sql, [invitado_id]);
     return res;
   }
+
+  // Busca invitados (con email) de una reserva, opcionalmente solo los no notificados,
+  async buscarPendientesConContexto(reserva_id, soloPendientes = true) {
+    let sql = `
+      SELECT
+        i.invitado_id,
+        i.nombre                                       AS invitado_nombre,
+        i.email                                        AS invitado_email,
+        i.notificado,
+
+        r.reserva_id,
+        r.fecha_reserva,
+        r.tematica,
+
+        s.titulo                                       AS salon_titulo,
+        s.direccion                                    AS salon_direccion,
+
+        t.hora_desde,
+        t.hora_hasta,
+
+        DATE_FORMAT(r.fecha_reserva, '%d/%m/%Y')       AS fecha_str,
+        CONCAT(LPAD(HOUR(t.hora_desde),2,'0'), ':', LPAD(MINUTE(t.hora_desde),2,'0'),
+              ' – ',
+              LPAD(HOUR(t.hora_hasta),2,'0'), ':', LPAD(MINUTE(t.hora_hasta),2,'0')
+        )                                              AS hora_label
+      FROM invitados i
+      INNER JOIN reservas r ON r.reserva_id = i.reserva_id
+      LEFT  JOIN salones  s ON s.salon_id  = r.salon_id
+      LEFT  JOIN turnos   t ON t.turno_id  = r.turno_id
+      WHERE i.activo = 1
+        AND i.reserva_id = ?
+        AND i.email IS NOT NULL AND i.email <> ''
+    `;
+
+    const params = [reserva_id];
+    if (soloPendientes) {
+      sql += ` AND i.notificado = 0`;
+    }
+
+    sql += ` ORDER BY i.creado DESC, i.invitado_id DESC`;
+
+    const [rows] = await conexion.execute(sql, params);
+    return rows.map(r => ({
+      invitado_id: r.invitado_id,
+      invitado_nombre: r.invitado_nombre,
+      invitado_email: r.invitado_email,
+      reserva_id: r.reserva_id,
+      fecha_reserva: r.fecha_reserva,
+      tematica: r.tematica || "",
+      salon_titulo: r.salon_titulo || "",
+      salon_direccion: r.salon_direccion || "",
+      hora_desde: r.hora_desde,
+      hora_hasta: r.hora_hasta,
+      fecha_str: r.fecha_str || "",
+      hora_label: r.hora_label || ""
+    }));
+  }
+
 }

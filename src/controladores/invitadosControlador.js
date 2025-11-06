@@ -5,7 +5,7 @@ export default class InvitadosControlador {
     this.servicio = new InvitadosServicio();
   }
 
-  // GET /api/v1/invitados (solo 1,2,3)
+  // GET /api/v1/invitados (1,2,3)
   listarTodos = async (req, res) => {
     try {
       const invitados = await this.servicio.listarTodos(req.user);

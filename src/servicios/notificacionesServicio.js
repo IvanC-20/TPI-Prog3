@@ -81,45 +81,46 @@ export default class NotificacionesServicio {
   enviarNotificacionPush = async (datos) => {};
 
  
-async enviarInvitacionCumple({ invitado, reserva, salon = {}, public_base_url = "http://localhost:3000" }) {
+  async enviarInvitacionCumple({ invitado, reserva, salon = {}}) {
   try {
-    // Validaciones mínimas
-    if (!invitado?.email || !invitado.email.includes("@")) {
-      console.warn("Invitado sin email válido, se omite:", invitado);
+    const email = invitado?.email?.trim();
+    if (!email || !email.includes("@")) {
+      console.warn("[enviarInvitacionCumple] Invitado sin email válido, se omite:", invitado);
       return false;
     }
 
-    // 1) Armar datos tal como los usa la plantilla handlebars
     const datos = {
       invitado: {
-        invitado_id: invitado.invitado_id,
-        nombre: invitado.nombre || "Invitado",
-        email: invitado.email
+        invitado_id: invitado?.invitado_id ?? null,
+        nombre: (invitado?.nombre && String(invitado.nombre).trim()) || "Invitado",
+        email
       },
       reserva: {
-        fecha: dayjs(reserva.fecha).format("DD/MM/YYYY"),
-        hora: reserva.hora || "",
-        tematica: reserva.tematica || ""
+        fecha: reserva?.fecha || "",                        
+        hora: (reserva?.hora && String(reserva.hora).trim()) || "",
+        tematica: (reserva?.tematica && String(reserva.tematica).trim()) || ""
       },
-      salon: salon ? {
-        titulo: salon.titulo || "",
-        direccion: salon.direccion || ""
-      } : {},
-      public_base_url
+      salon: {
+        titulo: (salon?.titulo && String(salon.titulo).trim()) || "Salón",
+        direccion: (salon?.direccion && String(salon.direccion).trim()) || ""
+      }
     };
 
-    // 2) Compilar plantilla
     const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
+    const __dirname  = path.dirname(__filename);
     const plantillaPath = path.join(__dirname, "../utils/handlebars/invitacion.hbs");
     const plantilla = fs.readFileSync(plantillaPath, "utf-8");
-    const template = handlebars.compile(plantilla);
-    const html = template(datos);
+    const template  = handlebars.compile(plantilla);
+    const html      = template(datos);
 
-    // 3) Asunto cumpleañero
-    const subject = `🎂 Invitación: ${datos.reserva.fecha}${datos.reserva.hora ? " · " + datos.reserva.hora : ""} – ${datos.salon.titulo || "¡A festejar!"} 🎈`;
+    const subject = `🎂 Invitación: ${datos.reserva.fecha}${datos.reserva.hora ? " · " + datos.reserva.hora : ""} – ${datos.salon.titulo} 🎈`;
+    const text =
+      `¡Hola ${datos.invitado.nombre}! ` +
+      `Te invito el día ${datos.reserva.fecha}` +
+      (datos.reserva.hora ? ` a la hora ${datos.reserva.hora}` : "") +
+      ` en ${datos.salon.titulo}${datos.salon.direccion ? " (" + datos.salon.direccion + ")" : ""}. ` +
+      `Confirmá tu asistencia: http://localhost:3000/invitados/confirmar?id=${datos.invitado.invitado_id}`;
 
-    // 4) Transporter (Gmail)
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -127,24 +128,24 @@ async enviarInvitacionCumple({ invitado, reserva, salon = {}, public_base_url = 
         pass: process.env.PASSCORREO
       }
     });
+
     await transporter.verify();
 
-    // 5) Enviar
     const info = await transporter.sendMail({
       from: process.env.USERCORREO,
       to: datos.invitado.email,
       subject,
-      html
+      html,
+      text
     });
 
-    console.log(`📨 Invitación enviada a ${datos.invitado.email} (ID: ${datos.invitado.invitado_id}) → messageId=${info.messageId}`);
+    console.log(`[enviarInvitacionCumple] OK → messageId=${info.messageId} → ${datos.invitado.email}`);
     return true;
 
   } catch (err) {
-    console.error("Error enviando invitación (cumple):", err);
+    console.error("[enviarInvitacionCumple] ERROR:", err);
     throw err;
   }
 }
 
-  
 }

@@ -112,89 +112,73 @@ export default class InvitadosServicio {
 
   // POST /api/v1/invitados/notificar
   async notificarInvitados(data, usuario) {
+    const TAG = "[InvitadosServicio.notificarInvitados]";
+
     const { reserva_id } = data || {};
 
-    // Autenticación y permisos
-    if (!usuario) {
-      throw Object.assign(new Error("No autenticado."), { status: 401 });
-    }
+    // permisos
+    if (!usuario) throw Object.assign(new Error("No autenticado."), { status: 401 });
     if (usuario.tipo_usuario !== 1 && usuario.tipo_usuario !== 2) {
       throw Object.assign(new Error("No tiene permiso para notificar invitados."), { status: 403 });
     }
-    if (!reserva_id) {
-      throw Object.assign(new Error("reserva_id es obligatorio."), { status: 400 });
-    }
+    if (!reserva_id) throw Object.assign(new Error("reserva_id es obligatorio."), { status: 400 });
 
-    // Reserva (vía servicio)
-    const reserva = await this.reservasServicio.buscarPorId(Number(reserva_id));
-    if (!reserva) {
-      throw Object.assign(new Error("Reserva no encontrada."), { status: 404 });
-    }
+    const rows = await this.invitados.buscarPendientesConContexto(Number(reserva_id), true);
 
-    // Salón (opcional, vía servicio)
-    let salon = null;
-    try {
-      salon = reserva.salon_id ? await this.salonesServicio.obtenerSalonPorId(reserva.salon_id) : null;
-    } catch {}
-
-    // Turno (opcional, vía servicio)
-    let turno = null;
-    try {
-      turno = reserva.turno_id ? await this.turnosServicio.obtenerTurnoPorId(reserva.turno_id) : null;
-    } catch {}
-
-    // Fecha (DD/MM/YYYY)
-    const fechaStr = reserva.fecha_reserva
-      ? dayjs(reserva.fecha_reserva).format("DD/MM/YYYY")
-      : "";
-
-    // Hora / rango (del servicio de turnos: horaLabel)
-    const horaStr = turno?.horaLabel || "";
-
-    // Invitados pendientes (con email y notificado = 0)
-    const pendientes = await this.invitados.buscarConEmailPorReserva(Number(reserva_id), true);
-    if (!pendientes.length) {
+    if (!rows.length) {
       return { total: 0, enviados: 0, fallidos: 0, detalles: [] };
     }
 
-    // Concurrencia básica para evitar rate limit
+    const ctxReserva = {
+      fecha: rows[0].fecha_str,          
+      hora: rows[0].hora_label,         
+      tematica: rows[0].tematica || ""
+    };
+    const ctxSalon = {
+      titulo: rows[0].salon_titulo || "Salón",
+      direccion: rows[0].salon_direccion || ""
+    };
+
+    // Envíos por tandas
     const CHUNK = 5;
     const detalles = [];
 
-    for (let i = 0; i < pendientes.length; i += CHUNK) {
-      const slice = pendientes.slice(i, i + CHUNK);
+    for (let i = 0; i < rows.length; i += CHUNK) {
+      const slice = rows.slice(i, i + CHUNK);
 
       const resultados = await Promise.allSettled(
-        slice.map(async (inv) => {
+        slice.map(async (r, idx) => {
+          const invitadoCtx = {
+            invitado_id: r.invitado_id,
+            nombre: (r.invitado_nombre && String(r.invitado_nombre).trim()) || "Invitado",
+            email: r.invitado_email
+          };
+
           await this.notificaciones_servicio.enviarInvitacionCumple({
-            invitado: {
-              invitado_id: inv.invitado_id,
-              nombre: inv.nombre || "Invitado",
-              email: inv.email
-            },
-            reserva: {
-              fecha: fechaStr,
-              hora: horaStr,
-              tematica: reserva.tematica || ""
-            },
-            salon: salon ? { titulo: salon.titulo || "", direccion: salon.direccion || "" } : {},
-            public_base_url: process.env.PUBLIC_BASE_URL || "http://localhost:3000"
+            invitado: invitadoCtx,
+            reserva: ctxReserva, 
+            salon: ctxSalon
           });
 
-          await this.invitados.marcarNotificado(inv.invitado_id);
-          return { invitado_id: inv.invitado_id, email: inv.email, ok: true };
+          await this.invitados.marcarNotificado(r.invitado_id);
+
+          return { invitado_id: r.invitado_id, email: r.invitado_email, ok: true };
         })
       );
 
       resultados.forEach((r, idx) => {
-        const inv = slice[idx];
-        if (r.status === "fulfilled") detalles.push(r.value);
-        else detalles.push({ invitado_id: inv.invitado_id, email: inv.email, ok: false, error: r.reason?.message || "Error envío" });
+        const row = slice[idx];
+        if (r.status === "fulfilled") {
+          detalles.push(r.value);
+        } else {
+          detalles.push({ invitado_id: row.invitado_id, email: row.invitado_email, ok: false, error: r.reason?.message || "Error envío" });
+        }
       });
     }
 
     const enviados = detalles.filter(d => d.ok).length;
     const fallidos = detalles.length - enviados;
+
     return { total: detalles.length, enviados, fallidos, detalles };
   }
 
