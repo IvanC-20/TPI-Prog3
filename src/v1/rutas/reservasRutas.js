@@ -69,6 +69,12 @@
  *     description: "Solo Admin (1) puede modificar."
  *     tags: [Reservas]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: reserva_id
+ *         required: true
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -99,6 +105,12 @@
  *     description: "Solo Admin (1) puede eliminar."
  *     tags: [Reservas]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: reserva_id
+ *         required: true
+ *         schema:
+ *           type: integer
  *     responses:
  *       204:
  *         description: Eliminado
