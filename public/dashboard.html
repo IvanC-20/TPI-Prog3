@@ -1,15 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
   <title>Dashboard de Reservas</title>
+  <link rel="stylesheet" href="table.css">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-  <h1>Dashboard de Reservas</h1>
-  <ol id="lista-salones"></ol> 
-  <!-- <canvas id="reservasChart" width="400" height="200"></canvas> -->
 
-  <script src="dashboard.js"></script>
+<body>
+  <main>
+    <h1>dashboard</h1>
+    <hr class="linea-solida">
+    <h2>TABLA SALONES</h2>
+    <table>  
+      <thead id="cabecera-tabla-salones"></thead>
+      <tbody id="cuerpo-tabla-salones"></tbody>
+    </table>
+    
+    <h2>GRÁFICO SALONES POR IMPORTE</h2>
+    <div style="width: 80%; margin: auto;">
+      
+      <canvas id="salonesXImporteChart" width="400" height="200"></canvas>
+    </div>
+
+    <table>
+      <h2>TABLA USUARIOS</h2>
+      <thead id="cabecera-tabla-usuarios"></thead>
+      <tbody id="cuerpo-tabla-usuarios"></tbody>
+    </table>
+  </main>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="dashboard-tablas.js"></script>
+  <script src="dashboard-graficos.js"></script>
 </body>
+
 </html>

@@ -58,18 +58,6 @@ app.get("/dashboard", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "dashboard.html"));
 });
 
-// API de ejemplo para dashboard
-app.get("/api/dashboard/reservas", passport.authenticate('jwt', { session: false }), async (req, res) => {
-    try {
-        // Llamada al router/controlador de reservas para traer datos reales
-        const datos = await getReservas(); // <-- función que devuelve las reservas desde DB
-        res.json(datos);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Error al obtener reservas" });
-    }
-});
-
 
 // Variables de entorno
 process.loadEnvFile();
