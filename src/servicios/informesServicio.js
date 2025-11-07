@@ -14,8 +14,10 @@ export default class InformesServicio{
              const csvWriter = createObjectCsvWriter({
                 path: ruta,
                 header: [
-                    { id: 'salon', title: 'Salón' },
-                    { id: 'total_ingresos', title: 'Ingresos Totales' }
+                    { id: 'salon_id', title: 'ID Salón' },
+                    { id: 'salon', title: 'Nombre' },
+                    { id: 'cantidad_reservas', title: 'Cantidad de Reservas' },
+                    { id: 'total_ingresos', title: 'Total Ingresos' }    
                 ]
             });
 
