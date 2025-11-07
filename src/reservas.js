@@ -12,16 +12,12 @@ import { router as v1ServiciosRutas } from "./v1/rutas/serviciosRutas.js";
 import { router as v1TurnosRutas } from './v1/rutas/turnosRutas.js';
 import { router as v1UsuariosRutas } from './v1/rutas/usuariosRutas.js';
 import { router as v1ReservasRutas } from './v1/rutas/reservasRutas.js';
-<<<<<<< HEAD
+
 import { router as v1AuthRouter} from './v1/rutas/authRoutes.js';
 import { buildSwaggerSpec } from "./docs/swagger.js";
 import { router as v1InvitadosRutas } from "./v1/rutas/invitadosRutas.js";
 import { router as invitadosPublicosRutas } from "./v1/rutas/invitadosPublicosRutas.js";
-=======
-import { router as v1AuthRouter } from './v1/rutas/authRoutes.js';
-import { router as invitadosRouter } from "./v1/rutas/invitadosRutas.js";
-import { buildSwaggerSpec } from "./docs/swagger.js";
->>>>>>> tablero
+
 
 // Para ESM __dirname
 const __dirname = path.resolve();
