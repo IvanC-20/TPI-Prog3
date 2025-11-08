@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>💌 Invitación Especial</title>
+  <style>
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, #c6fff2, #d7f8ff);
+      color: #1b1b1b;
+      text-align: center;
+      margin: 0;
+      padding: 50px 0;
+    }
+
+    .card {
+      max-width: 640px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+      border: 3px solid #b5f5ec;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      background: linear-gradient(90deg, #4cc9f0, #06d6a0);
+      color: #fff;
+      padding: 38px 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .content {
+      padding: 38px 35px 45px;
+    }
+
+    .bigline {
+      font-size: 19px;
+      line-height: 1.7;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .destacado {
+      background: linear-gradient(180deg, #ecfffb, #f3fcff);
+      border: 2px solid #a7f1e7;
+      border-radius: 14px;
+      padding: 18px 24px;
+      margin: 0 auto 28px;
+      display: inline-block;
+      text-align: left;
+      color: #046e68;
+      font-size: 16px;
+    }
+
+    .destacado .row {
+      margin: 6px 0;
+    }
+
+    .destacado b {
+      color: #007a74;
+    }
+
+    .tematica {
+      background: #e2fbf6;
+      border-radius: 14px;
+      border: 2px dashed #06d6a0;
+      display: inline-block;
+      padding: 10px 18px;
+      margin: 12px auto 0;
+      color: #007a5c;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .boton {
+      display: inline-block;
+      margin-top: 30px;
+      background: linear-gradient(90deg, #4cc9f0, #06d6a0);
+      color: #fff !important;
+      text-decoration: none;
+      padding: 15px 38px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 17px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .boton:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .boton:active {
+      transform: scale(0.97);
+    }
+
+    footer {
+      background: #f8fffd;
+      color: #666;
+      padding: 16px;
+      font-size: 14px;
+      border-top: 1px solid #d9f8f4;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <header>
+      <h1>¡Hola {{invitado.nombre}}! 🎉</h1>
+    </header>
+
+    <div class="content">
+      <p class="bigline">
+        Te invito el <b>{{reserva.fecha}}</b>{{#if reserva.hora}} a las <b>{{reserva.hora}}</b>{{/if}}<br/>
+        en <b>{{salon.titulo}}</b>{{#if salon.direccion}} ({{salon.direccion}}){{/if}}.<br/>
+        <b>¡Nos encantará verte allí!</b> 🌿✨
+      </p>
+
+      <div class="destacado">
+        <div class="row">📅 <b>Fecha:</b> {{reserva.fecha}}</div>
+        {{#if reserva.hora}}<div class="row">🕒 <b>Hora:</b> {{reserva.hora}}</div>{{/if}}
+        <div class="row">📍 <b>Lugar:</b> {{salon.titulo}}{{#if salon.direccion}} – {{salon.direccion}}{{/if}}</div>
+      </div>
+
+      {{#if reserva.tematica}}
+        <div class="tematica">🌸 Tema del evento: “{{reserva.tematica}}”</div>
+      {{/if}}
+
+      <div style="text-align:center;">
+        <a class="boton"
+           href="http://localhost:3000/invitacion/confirmar?id={{invitado.invitado_id}}"
+           target="_blank">
+           💚 Confirmar asistencia
+        </a>
+      </div>
+    </div>
+
+    <footer>
+      &copy; 2025 · ¡Te esperamos con alegría! 💙🌱
+    </footer>
+  </div>
+</body>
+</html>

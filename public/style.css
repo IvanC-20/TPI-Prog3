@@ -1,0 +1,35 @@
+body {
+    background-color: #004fa3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+main {
+    width: 75%;
+    margin: 25px 0;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 25px;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+hr {
+  border: none; 
+  height: 1px; 
+  background-color: #333; 
+  margin: 1em 0; 
+}
+.linea-solida {
+  border: none;
+  height: 3px; /* Más gruesa */
+  background-color: #007bff; /* Color azul brillante */
+  width: 50%; /* Ocupa solo la mitad del ancho */
+  margin: 20px auto; /* Centrar la línea */
+}

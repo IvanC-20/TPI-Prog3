@@ -1,4 +1,7 @@
 import Salones from "../db/salones.js";
+import dayjs from "dayjs";
+import "dayjs/locale/es.js";
+dayjs.locale("es");
 
 export default class SalonesServicio {
   constructor() {
@@ -6,13 +9,23 @@ export default class SalonesServicio {
   }
 
   async buscarTodos() {
-    return await this.salones.buscarTodos();
+    const rows = await this.salones.buscarTodos();
+    return rows.map(salon => ({
+      ...salon,
+      creado: salon.creado ? dayjs(salon.creado).format("DD/MM/YYYY HH:mm") : null,
+      modificado: salon.modificado ? dayjs(salon.modificado).format("DD/MM/YYYY HH:mm") : null
+    }));
   }
 
   async obtenerSalonPorId(salon_id) {
     const results = await this.salones.obtenerSalonPorId(salon_id);
     if (results.length === 0) throw new Error("Salón no encontrado.");
-    return results[0];
+    const salon = results[0];
+    return {
+      ...salon,
+      creado: salon.creado ? dayjs(salon.creado).format("DD/MM/YYYY HH:mm") : null,
+      modificado: salon.modificado ? dayjs(salon.modificado).format("DD/MM/YYYY HH:mm") : null
+    };
   }
 
   async crearSalon(data) {
@@ -20,8 +33,16 @@ export default class SalonesServicio {
     if (!titulo || !direccion || !capacidad || !importe) {
       throw new Error("Faltan campos requeridos.");
     }
+
+    const ahora = new Date();
     const result = await this.salones.crearSalon(data);
-    return { id: result.insertId, ...data };
+
+    return {
+      salon_id: result.insertId,
+      ...data,
+      creado: dayjs(ahora).format("DD/MM/YYYY HH:mm"),
+      modificado: dayjs(ahora).format("DD/MM/YYYY HH:mm")
+    };
   }
 
   async actualizarSalon(salon_id, data) {
@@ -33,6 +54,7 @@ export default class SalonesServicio {
       throw new Error("Faltan campos requeridos.");
     }
 
+    const ahora = new Date();
     await this.salones.actualizarSalon({
       salon_id,
       titulo,
@@ -40,7 +62,15 @@ export default class SalonesServicio {
       capacidad,
       importe,
     });
-    return data;
+
+    return {
+      salon_id,
+      titulo,
+      direccion,
+      capacidad,
+      importe,
+      modificado: dayjs(ahora).format("DD/MM/YYYY HH:mm")
+    };
   }
 
   async eliminarSalon(salon_id) {

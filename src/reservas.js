@@ -1,272 +1,77 @@
+// src/reservas.js
 import express from 'express';
+import passport from 'passport';
+import morgan from 'morgan';
+import fs from 'fs';
+import path, { dirname } from 'path';
+import swaggerUi from "swagger-ui-express";
+
+import { estrategia, validacion } from './config/passport.js';
 import { router as v1SalonesRutas } from './v1/rutas/salonesRutas.js';
+import { router as v1ServiciosRutas } from "./v1/rutas/serviciosRutas.js";
+import { router as v1TurnosRutas } from './v1/rutas/turnosRutas.js';
+import { router as v1UsuariosRutas } from './v1/rutas/usuariosRutas.js';
+import { router as v1ReservasRutas } from './v1/rutas/reservasRutas.js';
+import { router as v1AuthRouter} from './v1/rutas/authRoutes.js';
+import { buildSwaggerSpec } from "./docs/swagger.js";
+import { router as v1InvitadosRutas } from "./v1/rutas/invitadosRutas.js";
+import { router as invitadosPublicosRutas } from "./v1/rutas/invitadosPublicosRutas.js";
+
+
+// Para ESM __dirname
+const __dirname = path.resolve();
+
+// Crear app primero
 const app = express();
 
+// Middlewares
 app.use(express.json());
-app.use('/api/v1/salones', v1SalonesRutas);
-// hacer esto para cada entidad
+app.use(express.static(path.join(__dirname, "public"))); // Carpeta para HTML/CSS/JS
+app.use(passport.initialize());
+passport.use(estrategia);
+passport.use(validacion);
 
-// ESTO DEJAMOS COMENTADO PERO CUANDO SABEMOS QUE FUNCIONA EL CRUD DE SALONES, VUELAA
-// DONDE DEJAMOS NOTIFICACION??? TMB ESTA AQUI COMENTADO
+// Morgan logs
+const log = fs.createWriteStream('./access.log', { flags: 'a' });
+app.use(morgan('combined')); // consola
+app.use(morgan('combined', { stream: log })); // archivo
 
-/*import express from "express";
-import handlebars from "handlebars";
-import nodemailer from "nodemailer";
-import { fileURLToPath } from "url";
-import { readFile } from "fs/promises";
-import path from "path";
-import { conexion } from "./db/conexion.js";
+// Swagger
+const swaggerSpec = buildSwaggerSpec();
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Rutas
+app.use('/api/v1/auth', v1AuthRouter);
 
-const app = express();
-//reservas, reservas2025
-//Midleware para parchear json en las peticiones
-app.use(express.json());
+app.use('/api/v1/usuarios', passport.authenticate('jwt', { session:false }), v1UsuariosRutas);
+app.use('/api/v1/turnos', passport.authenticate('jwt', { session:false }), v1TurnosRutas);
+app.use('/api/v1/servicios', passport.authenticate('jwt', { session:false }), v1ServiciosRutas);
 
-app.get('/estado', (req, res) => {
-    //res.json({'ok': true});
-    res.status(201).send({ 'estado': true, 'Mensaje': 'Reserva creada!' });
-})
+app.use('/api/v1/salones', passport.authenticate( 'jwt', { session:false }), v1SalonesRutas);
+app.use('/api/v1/reservas', passport.authenticate( 'jwt', { session:false }), v1ReservasRutas);
+app.use("/api/v1/invitados", passport.authenticate( 'jwt', { session:false }), v1InvitadosRutas);
 
-app.post('/notificacion', async (req, res) => {
-    console.log(req.body);
-    const { fecha, salon, turno, correoDestino } = req.body;
-
-    if (!req.body.fecha || !req.body.salon || !req.body.turno || !req.body.correoDestino) {
-        res.status(400).send({ 'estado': false, 'Mensaje': 'Faltan datos requeridos' });
-    }
-
-    try {
-        //me da url del archivo actual, con fileURLToPath convierto en una ruta absoluta 
-        // del sistema, la ruta del archivo actual
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
-
-        const plantilla = path.join(__dirname, 'utils', 'handlebars', 'plantilla.hbs');
-        //dirección absoluta plantilla
-        //console.log(plantilla);
-        //leo plantilla
-        const datos = await readFile(plantilla, 'utf-8');
-        //compilo plantilla
-        const template = handlebars.compile(datos);
-        //paso los datos a mi plantilla
-        var html = template(
-            {
-                fecha: fecha,
-                salon: salon,
-                turno: turno,
-                correoDestino: correoDestino
-            });
-
-        //console.log(html)
+// público
+app.use('/invitacion', invitadosPublicosRutas);
 
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.USER,
-                pass: process.env.PASS,
-            },
-        });
+// Ruta del login (HTML)
+app.get("/login", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "login.html"));
+});
 
-        const opciones = {
-            to: correoDestino,
-            subject: 'Notificación',
-            html: html
-        };
-
-        transporter.sendMail(opciones, (error, info) => {
-            if (error) {
-                console.log(error);
-                res.json({ 'ok': false, 'mensaje': 'Error al enviar!' });
-            }
-            console.log(info);
-            res.json({ 'ok': true, 'mensaje': 'Correo enviado!' });
-        });
-
-    } catch (error) {
-        console.log(error);
-    }
-
-    //res.json({'oki': true});
-})
-
-//ruta para obtener un salón
-app.get('/salones/:salon_id', async (req, res) => {
-    try {
-        const salon_id = req.params.salon_id;
-        const sql = `SELECT * FROM salones WHERE activo = 1 and salon_id = ?`;
-        const valores = [salon_id];
-        //usando sentencias preparadas evitamos la injección sql,
-        //los datos del array se vinculan de forma segura a la consulta
-        const [results, fields] = await conexion.execute(sql, valores);
-
-        if (results.length === 0) {
-            return res.status(404).json({
-                estado: false,
-                mensaje: "Salón no encontrado."
-            })
-        }
-
-        //console.log(results); // results contains rows returned by server
-        //console.log(fields); // fields contains extra meta data about results, if available
-        res.json({
-            estado: true,
-            salon: results[0]
-        });
-
-    } catch (err) {
-        console.log("Error en GET/salones/:salon_id", err);
-        res.status(500).json({
-            estado: false,
-            mensaje: "Error interno del servidor."
-        })
-    }
-
-})
-
-app.post('/salones', async (req, res) => {
-
-    try {
-
-        //falta validar con express validator, queda para mas adelante con un middleware
-        //control datos requeridos
-        if (!req.body.titulo || !req.body.direccion || !req.body.capacidad || !req.body.importe) {
-            return res.status(400).json({
-                estado: false,
-                mensaje: "Faltan campos requeridos."
-            })
-        }
-
-        const { titulo, direccion, capacidad, importe } = req.body;
-        const valores = [titulo, direccion, capacidad, importe];
-        const sql = `INSERT INTO salones (titulo, direccion, capacidad, importe) 
-                    VALUES (?,?,?,?)`;
+// Ruta del dashboard (HTML)
+app.get("/dashboard", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+});
 
 
-        const result = await conexion.execute(sql, valores);
-        console.log(result);
-        res.status(201).json({
-            estado: true,
-            mensaje: `Salón creado con id: ${result[0].insertId}`,
-            Salon: {
-                titulo: valores[0],
-                direccion: valores[1],
-                capacidad: valores[2],
-                importe: valores[3]
-
-            }
-        });
-
-    } catch (err) {
-        console.log("Error en POST/salones", err);
-        res.status(500).json({
-            estado: false,
-            mensaje: "Error interno del servidor."
-        })
-    }
-})
-
-app.put("/salones/:salon_id", async (req, res) => {
-    try {
-        const salon_id = req.params.salon_id;
-
-        const sql = `SELECT * FROM salones WHERE activo = 1 and salon_id = ?`;
-
-        //usando sentencias preparadas evitamos la injección sql,
-        //los datos del array se vinculan de forma segura a la consulta
-        const [results] = await conexion.execute(sql, [salon_id]);
-
-        if (results.length === 0) {
-            return res.status(404).json({
-                estado: false,
-                mensaje: "Salón no existe."
-            })
-        }
-
-        if (!req.body.titulo || !req.body.direccion || !req.body.capacidad || !req.body.importe) {
-            return res.status(400).json({
-                estado: false,
-                mensaje: "Faltan campos requeridos."
-            })
-        }
-
-        const { titulo, direccion, capacidad, importe } = req.body;
-        const valores = [titulo, direccion, capacidad, importe, salon_id];
-        const sql1 = `UPDATE salones SET titulo=?, direccion=?, capacidad=?, importe=? 
-                    WHERE salon_id = ?`;
-
-
-        const result = await conexion.execute(sql1, valores);
-        console.log(result);
-        res.status(200).json({
-            estado: true,
-            mensaje: `Salón modificado.`,
-            Salon: {
-                titulo: valores[0],
-                direccion: valores[1],
-                capacidad: valores[2],
-                importe: valores[3]
-            }
-        })
-    } catch (error) {
-        console.log("Error en PUT/salones/:salon_id", error);
-        res.status(500).json({
-            estado: false,
-            mensaje: "Error interno del servidor."
-        })
-
-    }
-})
-
-app.delete("/salones/:salon_id", async (req, res) => {
-
-    try {
-        const salon_id = req.params.salon_id;
-
-        const sql = `SELECT * FROM salones WHERE activo = 1 and salon_id = ?`;
-
-        //usando sentencias preparadas evitamos la injección sql,
-        //los datos del array se vinculan de forma segura a la consulta
-        const [results] = await conexion.execute(sql, [salon_id]);
-
-        if (results.length === 0) {
-            return res.status(404).json({
-                estado: false,
-                mensaje: "Salón no existe."
-            })
-        }
-
-        const valores = [0, salon_id];
-        const sql1 = `UPDATE salones SET activo=? 
-                    WHERE salon_id = ?`;
-
-
-        const [result] = await conexion.execute(sql1, valores);
-        console.log(result);
-        if (result.affectedRows == 1) {
-            res.status(200).json({
-                estado: true,
-                mensaje: `Salón ${salon_id} eliminado. (Estado activo = 0)`,
-
-            })
-        }
-    } catch (error) {
-        console.log("Error en PATCH/salones/:salon_id", error);
-        res.status(500).json({
-            estado: false,
-            mensaje: "Error interno del servidor."
-        })
-    }
-
-})
-*/
-
-//cargamos las variables de entorno que estan definidas en el archivo .env (en el objeto process.env)
+// Variables de entorno
 process.loadEnvFile();
-//Inicio servidor en puerto especificado
-app.listen(process.env.PUERTO, () => {
-    console.log(`Servidor arriba en Puerto:  ${process.env.PUERTO}`)
-})
 
+// Levantar servidor
+const PORT = process.env.PUERTO || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor arriba en Puerto: ${PORT}`);
+});
 

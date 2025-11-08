@@ -1,38 +1,146 @@
-import express from "express";
-import { body, validationResult } from "express-validator";
-import SalonesControlador from "../../controladores/salonesControlador.js";
+/**
+ * @openapi
+ * tags:
+ *   - name: Salones
+ *     description: Gestión de salones
+ */
 
-const router = express.Router();
+/**
+ * @openapi
+ * /salones:
+ *   get:
+ *     summary: Lista salones (1,2,3).
+ *     tags: [Salones]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: OK }
+ *   post:
+ *     summary: Crea salón (solo 1,2).
+ *     tags: [Salones]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [titulo, direccion, capacidad, importe]
+ *             properties:
+ *               titulo:    { type: string, example: "Salón Los Jacarandás" }
+ *               direccion: { type: string, example: "Av. Libertador 1234, CABA" }
+ *               capacidad: { type: integer, example: 40 }
+ *               importe:   { type: number, example: 180000 }
+ *               latitud:   { type: ["number","null"], example: -34.6037 }
+ *               longitud:  { type: ["number","null"], example: -58.3816 }
+ *     responses:
+ *       201: { description: Creado }
+ */
+
+/**
+ * @openapi
+ * /salones/{salon_id}:
+ *   get:
+ *     summary: Obtiene salón por ID (1,2,3).
+ *     tags: [Salones]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: salon_id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200: { description: OK }
+ *       404: { description: No encontrado }
+ *   put:
+ *     summary: Edita salón (solo 1,2).
+ *     tags: [Salones]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: salon_id
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               titulo:    { type: string, example: "Salón Los Jacarandás (modificado)" }
+ *               direccion: { type: string, example: "Av. Libertador 1234, CABA" }
+ *               capacidad: { type: integer, example: 42 }
+ *               importe:   { type: number, example: 190000 }
+ *     responses:
+ *       200: { description: Actualizado }
+ *   delete:
+ *     summary: Borra salón (soft delete) (solo 1,2).
+ *     tags: [Salones]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: salon_id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       204: { description: Eliminado }
+ */
+
+import express from 'express';
+import { check } from 'express-validator';
+import { validarCampos } from '../../middlewares/validarCampos.js';
+import autorizarUsuarios from '../../middlewares/autorizarUsuarios.js';
+import SalonesControlador from '../../controladores/salonesControlador.js';
+
 const salonesControlador = new SalonesControlador();
+const router = express.Router();
 
-const validarSalon = [
-  body("titulo")
-    .notEmpty()
-    .withMessage("El título es obligatorio")
-    .isLength({ min: 3 })
-    .withMessage("El título debe tener al menos 3 caracteres"),
-  body("direccion")
-    .notEmpty()
-    .withMessage("La dirección es obligatoria"),
-  body("capacidad")
-    .isInt({ min: 1 })
-    .withMessage("La capacidad debe ser un número entero mayor que 0"),
-  body("importe")
-    .isFloat({ min: 0 })
-    .withMessage("El importe debe ser un número positivo"),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errores: errors.array() });
-    }
-    next();
-  },
-];
+// Rutas de salones
+// Roles: 1 = Administrador, 2 = Empleado, 3 = Cliente
+// Permisos:
+// - GET (listar o ver salón): roles [1, 2, 3]
+// - POST (crear salón): roles [1, 2]
+// - PUT (editar salón): roles [1, 2]
+// - DELETE (eliminar salón): roles [1, 2]
 
-router.get("/", salonesControlador.buscarTodos);
-router.get("/:salon_id", salonesControlador.obtenerSalonPorId);
-router.post("/", salonesControlador.crearSalon);
-router.put("/:salon_id", salonesControlador.actualizarSalon);
-router.delete("/:salon_id", salonesControlador.eliminarSalon);
+router.get('/:salon_id', autorizarUsuarios([1,2,3]), salonesControlador.obtenerSalonPorId);
+router.get('/', autorizarUsuarios([1,2,3]), salonesControlador.buscarTodos);
+router.delete('/:salon_id', autorizarUsuarios([1,2]), salonesControlador.eliminarSalon);
+
+router.post('/',
+    autorizarUsuarios([1,2]),
+    [
+        check('titulo', 'El título es obligatorio').notEmpty().isLength({ min: 3 }).withMessage('El título debe tener al menos 3 caracteres'),
+        check('direccion', 'La dirección es obligatoria').notEmpty(),
+        check('capacidad', 'La capacidad es obligatoria')
+            .notEmpty()
+            .isInt({ min: 1 })
+            .withMessage('La capacidad debe ser un número entero mayor que 0'),
+        check('importe', 'El importe es obligatorio')
+            .notEmpty()
+            .isFloat({ min: 0 })
+            .withMessage('El importe debe ser un número positivo'),
+        validarCampos
+    ],
+    salonesControlador.crearSalon
+);
+
+router.put('/:salon_id',
+    autorizarUsuarios([1,2]),
+    [
+        check('titulo', 'El título es obligatorio').notEmpty().isLength({ min: 3 }).withMessage('El título debe tener al menos 3 caracteres'),
+        check('direccion', 'La dirección es obligatoria').notEmpty(),
+        check('capacidad', 'La capacidad es obligatoria')
+            .notEmpty()
+            .isInt({ min: 1 })
+            .withMessage('La capacidad debe ser un número entero mayor que 0'),
+        check('importe', 'El importe es obligatorio')
+            .notEmpty()
+            .isFloat({ min: 0 })
+            .withMessage('El importe debe ser un número positivo'),
+        validarCampos
+    ],
+    salonesControlador.actualizarSalon
+);
 
 export { router };
