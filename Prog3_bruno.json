@@ -1,0 +1,621 @@
+{
+  "name": "Prog3",
+  "version": "1",
+  "items": [
+    {
+      "type": "http",
+      "name": "Crear Reserva",
+      "filename": "Crear Reserva.bru",
+      "seq": 11,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/reservas",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n\"fecha_reserva\": \"2026-12-01\",\n\"salon_id\": 18,\n\"usuario_id\": 8,  \n\"turno_id\": 3,\n\"foto_cumpleaniero\": \"https://example.com/foto3.jpg\",\n\"tematica\": \"Nada\",\n\"importe_salon\": 150000.0,\n\"importe_total\": 180000.0,\n\"servicios\": [\n  {\n    \"servicio_id\": 10,\n    \"importe\": 80000\n  }\n  ]\n}\n",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{authToken}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Crear Salón",
+      "filename": "Crear Salón.bru",
+      "seq": 5,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/salones",
+        "method": "POST",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{ \n \"titulo\":\"Navalito\", \n \"direccion\":\"8 de Junio 1000\", \n \"capacidad\": 100,\n  \"importe\":\"250000\" \n}",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvX2lkIjo5LCJ1c3VhcmlvIjoiSnVhbiBBbGVtYW4iLCJ0aXBvX3VzdWFyaW8iOjMsImlhdCI6MTc2MjQxMzgxNywiZXhwIjoxNzYyNDE3NDE3fQ.bgskcq5DfNOiYhvRvSG4F46AlQmtUhSL09u5WVrn3PI"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Eliminar Salón activo=0",
+      "filename": "Eliminar Salón activo=0.bru",
+      "seq": 7,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/salones/50",
+        "method": "DELETE",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "inherit"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "estado",
+      "filename": "estado.bru",
+      "seq": 1,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/estado",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "inherit"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Informe",
+      "filename": "Informe.bru",
+      "seq": 14,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/reservas/informe",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvX2lkIjo4LCJ1c3VhcmlvIjoiSXbDoW4gQ8OhY2VyZXMiLCJ0aXBvX3VzdWFyaW8iOjEsImlhdCI6MTc2MjQ5NzM5MywiZXhwIjoxNzYyNTAwOTkzfQ.NOj_D90eEGdse8PSNKKSZHNEhnYhrCxdFQqvM4UM8qc"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Listar turnos",
+      "filename": "Listar turnos.bru",
+      "seq": 13,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/turnos",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{authToken}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Loguearse",
+      "filename": "Loguearse.bru",
+      "seq": 9,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/auth/login",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"nombre_usuario\":\"ivan123@gmail.com\",\n  \"contrasenia\":\"ivan123\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {
+          "res": "const responseBody = res.getBody();\n\nconst token = responseBody.token; \n\nif (token) {\n\n    bru.setVar('authToken', token);\n\n    console.log('✅ Token capturado y guardado como Variable de Ejecución (authToken).');\n} else {\n    console.error('❌ Error: No se encontró el token en la respuesta.');\n}"
+        },
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{authToken}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Modificar Salón",
+      "filename": "Modificar Salón.bru",
+      "seq": 6,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/salones/14",
+        "method": "PUT",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"titulo\": \"San Lorenzo\", \n  \"direccion\":\"San Lorenzo 200\", \n  \"capacidad\": 200,\n  \"importe\": 250000\n}",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "inherit"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "notificacion",
+      "filename": "notificacion.bru",
+      "seq": 2,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "http://localhost:3000/notificacion",
+        "method": "POST",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"fecha\": \"18/09/2025\",\n  \"salon\": \"Principal\",\n  \"turno\": \"3\",\n  \"correoDestino\": \"iejcaceres@gmail.com\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "inherit"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Nuevo Servicio",
+      "filename": "Nuevo Servicio.bru",
+      "seq": 10,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/servicios",
+        "method": "POST",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"servicio_id\": 10,\n  \"descripcion\":\"Solista en vivo\",\n  \"importe\": 80000,\n  \"activo\": 1  \n}",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvX2lkIjo4LCJ1c3VhcmlvIjoiSXbDoW4gQ8OhY2VyZXMiLCJ0aXBvX3VzdWFyaW8iOjEsImlhdCI6MTc2MjQwOTg5MywiZXhwIjoxNzYyNDEzNDkzfQ.fgEE7JsGxSWDhMam3PHWDldVdej-ieBlEgECxSlNm4M"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Nuevo Usuario",
+      "filename": "Nuevo Usuario.bru",
+      "seq": 8,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/usuarios",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "enabled": true
+          },
+          {
+            "name": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n\"nombre\": \"José\",\n\"apellido\": \"Alem\",\n\"nombre_usuario\": \"jose123@gmail.com\",\n\"contrasenia\": \"jose123\",\n\"tipo_usuario\": 3,\n\"celular\": \"3442121222\",\n\"foto\": \"https://example.com/foto3.jpg\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{authToken}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "salon por id",
+      "filename": "salon por id.bru",
+      "seq": 4,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/salones/5",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{authToken}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Servicio por id",
+      "filename": "Servicio por id.bru",
+      "seq": 12,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/servicios/",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvX2lkIjo5LCJ1c3VhcmlvIjoiSnVhbiBBbGVtYW4iLCJ0aXBvX3VzdWFyaW8iOjMsImlhdCI6MTc2MjQxMzgxNywiZXhwIjoxNzYyNDE3NDE3fQ.bgskcq5DfNOiYhvRvSG4F46AlQmtUhSL09u5WVrn3PI"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "todos los salones activos",
+      "filename": "todos los salones activos.bru",
+      "seq": 3,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/salones",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{authToken}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Ver todas las reservas",
+      "filename": "Ver todas las reservas.bru",
+      "seq": 15,
+      "settings": {
+        "encodeUrl": true,
+        "timeout": 0
+      },
+      "tags": [],
+      "examples": [],
+      "request": {
+        "url": "{{urlAppi}}/api/v1/reservas",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{authToken}}"
+          }
+        }
+      }
+    }
+  ],
+  "environments": [],
+  "root": {
+    "request": {
+      "auth": {
+        "mode": "bearer"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{authToken}}",
+          "enabled": true,
+          "uid": "3KIS6qBeifQ1d6BOOqjyT"
+        }
+      ],
+      "vars": {
+        "req": [
+          {
+            "name": "urlAppi",
+            "value": "http://localhost:3000",
+            "enabled": true,
+            "local": false,
+            "uid": "JNP9CBOGk65Z6qtFHqg0Y"
+          },
+          {
+            "name": "authToken",
+            "value": "",
+            "enabled": true,
+            "local": false,
+            "uid": "vCs2he4ttm5mjhC30EBH5"
+          }
+        ]
+      }
+    }
+  },
+  "brunoConfig": {
+    "version": "1",
+    "name": "Prog3",
+    "type": "collection",
+    "ignore": [
+      "node_modules",
+      ".git"
+    ],
+    "size": 0.005542755126953125,
+    "filesCount": 16
+  }
+}
